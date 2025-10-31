@@ -27,6 +27,8 @@ def update():
         if game.control['game_over']:
             return
         
+        game.player.update_animation()
+        
         # Update score
         game.control['score'] += 1
         
@@ -37,6 +39,7 @@ def update():
         # Check if DOWN key is held for sliding
         if keyboard.down and not game.player.is_jumping:
             game.player.set_is_sliding(True) 
+            game.player.update_state('is_running')
         else:
             game.player.set_is_sliding(False) 
 
@@ -74,11 +77,13 @@ def draw():
     
 
     # Draw player
-    player_h = player.height // 2 if player.is_sliding else player.height
-    screen.draw.filled_rect(
-        Rect(player.x - player.width // 2, player.y - player_h // 2, player.width, player_h),
-        (255, 200, 0)
-    )
+    # player_h = player.height // 2 if player.is_sliding else player.height
+    # screen.draw.filled_rect(
+    #     Rect(player.x - player.width // 2, player.y - player_h // 2, player.width, player_h),
+    #     (255, 200, 0)
+    # )
+
+    player.actor.draw()
 
     # Draw obstacles
     for obs in game.obstacles:
