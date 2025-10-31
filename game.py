@@ -96,6 +96,7 @@ class Game:
         # Update obstacles
         for obs in self.obstacles[:]:
             obs.update_x_position(self.control['game_speed'])
+            obs.update_enemy_frames()
             # Remove off-screen obstacles
             if obs.x < - obs.width:
                 self.obstacles.remove(obs)

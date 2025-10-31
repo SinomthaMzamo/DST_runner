@@ -4,14 +4,14 @@ import random
 from entities.player import Player
 from game import Game
 
-config = {
+player_configuration = {
     'x': 150,
     'y': 300,
     'width': 40,
     'height': 80,
     }
-player = Player(config)
-game = Game(player)
+
+game = Game(Player(player_configuration))
 
 def on_key_down(key):
         if game.control['game_over']:
@@ -83,14 +83,18 @@ def draw():
     #     (255, 200, 0)
     # )
 
-    player.actor.draw()
+    game.player.actor.draw()
 
     # Draw obstacles
     for obs in game.obstacles:
-        screen.draw.filled_rect(
-            Rect(obs.x, obs.y - obs.height// 2, obs.width, obs.height),
-            obs.color
-        )
+        # screen.draw.filled_rect(
+        #     Rect(obs.x, obs.y - obs.height// 2, obs.width, obs.height),
+        #     obs.color
+        # )
+        obs.actor.draw()
+        # TODO: Debug outline for collisions
+        screen.draw.rect(obs.actor._rect, (255, 0, 0))
+        screen.draw.rect(game.player.actor._rect, (0, 255, 0))
 
     # Draw score
     screen.draw.text(f"Score: {int(game.control['score'])}", (10, 10), color='black', fontsize=30)
