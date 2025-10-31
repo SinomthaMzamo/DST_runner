@@ -64,9 +64,14 @@ def update():
 def draw():
     screen.clear()
     screen.fill((135, 206, 235))  # Sky blue
+    
 
-    # Draw ground
+    # Draw ground grass
     screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 40,Game.WIDTH, Game.HEIGHT - game.control['ground_y'] - 40), (100, 200, 100))
+
+    # Draw ground soil
+    screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 80,Game.WIDTH, Game.HEIGHT), (139, 69, 19))
+    
 
     # Draw player
     player_h = player.height // 2 if player.is_sliding else player.height

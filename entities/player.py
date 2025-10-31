@@ -7,11 +7,18 @@ class Player(Entity):
 
     def __init__(self, configuration):
         super().__init__(configuration)
+
         # Add player-specific attributes
         self.vertical_velocity = 0
         self.jump_speed = -15
         self.is_jumping = False
-        self.is_sliding = False      
+        self.is_sliding = False    
+
+    def update_state(self, attribute):
+        if attribute == 'is_jumping':
+            self.is_jumping = not self.is_jumping
+        if attribute == 'is_sliding':
+            self.is_sliding = not self.is_sliding
 
     def set_is_jumping(self, state):
         self.is_jumping = state
