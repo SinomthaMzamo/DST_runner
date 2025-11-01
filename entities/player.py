@@ -12,6 +12,7 @@ class Player(Entity):
     ''' Class representing the player '''
     DEFAULT_Y_POSITION = 300
     SLIDING_Y_POSITION = 320
+    CLOUD_Y_POSITION = 200
 
     def __init__(self, configuration):
         super().__init__(configuration)
@@ -74,11 +75,16 @@ class Player(Entity):
         self.set_y_position(final_velocity)
         self.actor.y = final_velocity
     
-    def collide(self):
-        self.set_y_position(Player.DEFAULT_Y_POSITION)
-        self.actor.y = Player.DEFAULT_Y_POSITION
+    def land(self, position=None):
+        """Called when the player lands on the ground."""
+        if position is None:
+            position = Player.DEFAULT_Y_POSITION
+
+        self.set_y_position(position)
+        self.actor.y = position
         self.vertical_velocity = 0
         self.is_jumping = False
+
 
     def slide(self):
         self.set_y_position(Player.SLIDING_Y_POSITION)

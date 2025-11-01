@@ -49,7 +49,7 @@ def update():
 
             # Ground collision
             if game.player.y >= 300:
-                game.player.collide()
+                game.player.land()
         else:
             # Keep player low while sliding
             game.player.slide()
@@ -57,10 +57,16 @@ def update():
         # Spawn obstacles
         game.obstacle_spawn_timer += 1
         if game.obstacle_spawn_timer >= game.obstacle_spawn_interval:
-            game.obstacles.append(game.create_obstacle())
+            if game.control['score'] % 2 == 0 and game.control['score'] > 150 and random.random() < 0.45:
+                game.obstacles.append(game.create_obstacle(obstacle_type='platform'))
+                print("there's a platform!", game.control['score'], 'obs y:', game.obstacles[-1].y, 'actor y:', game.obstacles[-1].actor.y)
+            else:
+                game.obstacles.append(game.create_obstacle())
             game.obstacle_spawn_timer = 0
             # Randomize next spawn slightly
             game.obstacle_spawn_interval = random.randint(70, 110)
+
+        
 
         game.update_obstacles()
 
@@ -91,6 +97,8 @@ def draw():
         #     Rect(obs.x, obs.y - obs.height// 2, obs.width, obs.height),
         #     obs.color
         # )
+        if obs.coin:
+            obs.coin.draw()
         obs.actor.draw()
         # TODO: Debug outline for collisions
         screen.draw.rect(obs.actor._rect, (255, 0, 0))
