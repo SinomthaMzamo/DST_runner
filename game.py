@@ -7,7 +7,7 @@ class Game:
     WIDTH = 800
     HEIGHT = 400
 
-    def __init__(self, player:Player):
+    def __init__(self, player:Player, sounds):
         self.obstacles:list[Enemy] = []
         self.obstacle_spawn_timer = 0
         self.obstacle_spawn_interval = 90
@@ -21,6 +21,7 @@ class Game:
         self.player = player
         self.collected_coins = 0
         self.game_started = False
+        self.sounds = sounds
 
     def start_game(self):
         self.game_started = True
@@ -57,7 +58,7 @@ class Game:
         }
 
         obstacle_configuration = obstacle_configurations[obstacle_type]
-        obstacle = Enemy(obstacle_configuration, obstacle_type)
+        obstacle = Enemy(obstacle_configuration, obstacle_type, self.sounds)
         return obstacle
     
     def reset(self):
@@ -117,6 +118,8 @@ class Game:
                     self.player.land(Player.CLOUD_Y_POSITION)
                 else:
                     self.control['game_over'] = True
+                    self.sounds.collide.play()
+                    self.sounds.lose.play()
 
             if obs.coin and not obs.coin.collected and player_rect.colliderect(obs.coin.actor._rect):
                 self.collected_coins += obs.coin.collect()

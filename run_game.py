@@ -24,7 +24,10 @@ exit_button = Rect(300, 380, 200, 50)
 sound_on = True
 music_on = True
 
-game = Game(Player(player_configuration))
+game = Game(Player(player_configuration), sounds)
+
+music.play('bg_music_welcome')
+music.set_volume(0.5)
 
 def on_mouse_down(pos):
     global game_state, sound_on, music_on
@@ -45,6 +48,8 @@ def on_key_down(key):
         if key == keys.SPACE:
             game.start_game()
             # update player state
+            music.play('bg_music_playing')
+            music.set_volume(0.5)
         return
 
     if game_state == 'playing':
@@ -58,6 +63,7 @@ def on_key_down(key):
     # Jump - only allow if not sliding
     if key == keys.UP and not game.player.is_jumping and not game.player.is_sliding:
         game.player.jump()
+        sounds.jump.play()
 
     elif game_state == 'menu' and key == keys.RETURN:
         game_state = 'playing'
@@ -93,6 +99,7 @@ def update():
         if keyboard.down and not game.player.is_jumping:
             game.player.set_is_sliding(True) 
             game.player.update_state('is_running')
+            sounds.slide.play()
         else:
             game.player.set_is_sliding(False) 
 
@@ -110,7 +117,7 @@ def update():
         # Spawn obstacles
         game.obstacle_spawn_timer += 1
         if game.obstacle_spawn_timer >= game.obstacle_spawn_interval:
-            if game.control['score'] % 7 == 0 and game.control['score'] > 150 and random.random() < 0.85:
+            if game.control['score'] % 7 == 0 and game.control['score'] > 30 and random.random() < 0.85:
                 game.obstacles.append(game.create_obstacle(obstacle_type='platform'))
                 # print("there's a platform!", game.control['score'], 'obs y:', game.obstacles[-1].y, 'actor y:', game.obstacles[-1].actor.y)
             else:

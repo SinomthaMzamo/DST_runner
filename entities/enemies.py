@@ -5,7 +5,7 @@ from random import random
 
 
 class Enemy(Entity):
-    def __init__(self, configuration, obstacle_type):
+    def __init__(self, configuration, obstacle_type, sounds=None):
         super().__init__(configuration)
         self.obstacle_type = obstacle_type
         self.color = self.set_enemy_colour()
@@ -14,7 +14,7 @@ class Enemy(Entity):
         if self.obstacle_type == "platform" and random() < 0.8:  # 60% chance
             coin_y = self.y - 50  # float above the platform
             # print(f"Creating coin at ({self.x}, {coin_y}) for platform at y={self.y}")
-            self.coin = Coin({'x':self.x, 'y':coin_y, 'width':50, 'height':50}, CoinValues.GOLD)
+            self.coin = Coin({'x':self.x, 'y':coin_y, 'width':50, 'height':50}, CoinValues.GOLD, sounds)
 
         # Add sprite animations
         self.floating_frames = ['enemy-blackhole1.png', 'enemy-blackhole2.png', 'enemy-blackhole3.png', 'enemy-blackhole4.png', 'enemy-blackhole5.png']

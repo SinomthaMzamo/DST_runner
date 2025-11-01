@@ -9,7 +9,7 @@ class CoinValues(Enum):
 
 
 class Coin(Entity):
-    def __init__(self, configuration, value:CoinValues):
+    def __init__(self, configuration, value:CoinValues, sounds):
         super().__init__(configuration)
         self.value = value
 
@@ -22,6 +22,7 @@ class Coin(Entity):
         self.current_frame = 0
         self.frame_delay = 5
         self.frame_counter = 0
+        self.sounds = sounds
 
     def update(self):
         self.frame_counter += 1
@@ -36,5 +37,6 @@ class Coin(Entity):
     def collect(self):
         if not self.collected:
             self.collected = True
+            self.sounds.collect.play()
             return self.value.value
         return 0
