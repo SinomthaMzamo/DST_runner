@@ -8,6 +8,7 @@ class PlayerState(Enum):
     JUMPING = 'is_jumping',
     IDLE = 'is_idle'    
 
+
 class Player(Entity):
     ''' Class representing the player '''
     DEFAULT_Y_POSITION = 300
@@ -84,7 +85,6 @@ class Player(Entity):
         self.actor.y = position
         self.vertical_velocity = 0
         self.is_jumping = False
-
 
     def slide(self):
         self.set_y_position(Player.SLIDING_Y_POSITION)

@@ -3,9 +3,9 @@ from entities.entity import Entity
 from pgzero.actor import Actor
 
 class CoinValues(Enum):
-    GOLD = 75
-    SILVER = 50
-    BRONZE = 35
+    GOLD = 8
+    SILVER = 4
+    BRONZE = 2
 
 
 class Coin(Entity):
@@ -36,3 +36,5 @@ class Coin(Entity):
     def collect(self):
         if not self.collected:
             self.collected = True
+            return self.value.value
+        return 0

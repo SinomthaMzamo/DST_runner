@@ -19,6 +19,7 @@ class Game:
             'player_gravity': 0.8,
         }
         self.player = player
+        self.collected_coins = 0
 
     def create_obstacle(self, obstacle_type=''):
         obstacle_type = random.choice(['ground', 'floating', 'floating-low']) if obstacle_type != 'platform' else  'platform'
@@ -73,6 +74,7 @@ class Game:
 
         for obs in self.obstacles[:]:
             obs.update_x_position(self.control['game_speed'])
+            obs.update_movement()
             obs.update_enemy_frames()
 
             # Remove off-screen obstacles
@@ -109,7 +111,8 @@ class Game:
                 else:
                     self.control['game_over'] = True
 
-            if obs.coin and player_rect.colliderect(obs.coin.actor._rect):
-                obs.coin.collect()
+            if obs.coin and not obs.coin.collected and player_rect.colliderect(obs.coin.actor._rect):
+                self.collected_coins += obs.coin.collect()
+
 
         
