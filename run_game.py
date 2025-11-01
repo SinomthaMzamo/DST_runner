@@ -47,7 +47,6 @@ def on_key_down(key):
     if not game.game_started:
         if key == keys.SPACE:
             game.start_game()
-            # update player state
             music.play('bg_music_playing')
             music.set_volume(0.5)
         return
@@ -82,9 +81,8 @@ def update():
         if game.control['game_over']:
             return
         
-        # Increase the counter each frame
         score_counter += 1
-        score_delay = 10  # how many frames to wait before adding 1 to the score
+        score_delay = 10  
 
         # Update the score only every `score_delay` frames
         if score_counter >= score_delay:
@@ -119,11 +117,9 @@ def update():
         if game.obstacle_spawn_timer >= game.obstacle_spawn_interval:
             if game.control['score'] % 7 == 0 and game.control['score'] > 30 and random.random() < 0.85:
                 game.obstacles.append(game.create_obstacle(obstacle_type='platform'))
-                # print("there's a platform!", game.control['score'], 'obs y:', game.obstacles[-1].y, 'actor y:', game.obstacles[-1].actor.y)
             else:
                 game.obstacles.append(game.create_obstacle())
             game.obstacle_spawn_timer = 0
-            # Randomize next spawn slightly
             game.obstacle_spawn_interval = random.randint(70, 110)
 
         game.update_obstacles()
@@ -135,10 +131,8 @@ def draw():
         draw_menu()
         return
 
-    screen.fill((34, 32, 64))  # Night Sky blue
-    # Draw ground grass
+    screen.fill((34, 32, 64))
     screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 40,Game.WIDTH, Game.HEIGHT - game.control['ground_y'] - 40), (44, 80, 44))
-    # Draw ground soil
     screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 80,Game.WIDTH, Game.HEIGHT), (60, 40, 20))
 
     game.player.actor.draw()
@@ -154,14 +148,11 @@ def draw():
             obs.coin.draw()
         obs.actor.draw()
         # TODO: Debug outline for collisions
-        screen.draw.rect(obs.actor._rect, (255, 0, 0))
-        screen.draw.rect(game.player.actor._rect, (0, 255, 0))
+        # screen.draw.rect(obs.actor._rect, (255, 0, 0))
+        # screen.draw.rect(game.player.actor._rect, (0, 255, 0))
 
-    # Draw score
     screen.draw.text(f"Score: {int(game.control['score'])}", (10, 10), color='whitesmoke', fontsize=30)
-    # Draw coins
-    screen.draw.text(f"Coins: {int(game.collected_coins)}", (Game.WIDTH // 2, 10), color='whitesmoke', fontsize=30)
-    # Draw instructions
+    screen.draw.text(f"Vault Balance: {int(game.collected_coins)}", (Game.WIDTH // 2, 10), color='whitesmoke', fontsize=30)
     screen.draw.text("UP: Jump  DOWN: Slide", (10, 50), color='whitesmoke', fontsize=20)
 
     if game.control['game_over']:

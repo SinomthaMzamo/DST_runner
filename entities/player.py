@@ -24,7 +24,7 @@ class Player(Entity):
         self.is_jumping = False
         self.is_sliding = False
         self.is_running = False
-        self.is_idleing = True    
+        self.is_idling = True    
 
         # Add sprite animations
         self.running_frames = ['player-run024.png', 'player-run025.png', 'player-run026.png', 'player-run027.png', 'player-run028.png', 'player-run029.png', 'player-run030.png', 'player-run031.png']
@@ -51,7 +51,7 @@ class Player(Entity):
                 frames = self.jumping_frames
             elif self.is_sliding:
                 frames = self.sliding_frames
-            elif self.is_idleing:
+            elif self.is_idling:
                 self.frame_delay = 12
                 frames = self.idle_frames
             else:

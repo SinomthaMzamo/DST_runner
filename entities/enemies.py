@@ -11,9 +11,8 @@ class Enemy(Entity):
         self.color = self.set_enemy_colour()
 
         self.coin = None
-        if self.obstacle_type == "platform" and random() < 0.8:  # 60% chance
-            coin_y = self.y - 50  # float above the platform
-            # print(f"Creating coin at ({self.x}, {coin_y}) for platform at y={self.y}")
+        if self.obstacle_type == "platform" and random() < 0.8:  
+            coin_y = self.y - 50  
             self.coin = Coin({'x':self.x, 'y':coin_y, 'width':50, 'height':50}, CoinValues.GOLD, sounds)
 
         # Add sprite animations
@@ -30,8 +29,8 @@ class Enemy(Entity):
         # For floating movement
         self.initial_y = self.y
         self.direction = 1  # 1 = up, -1 = down
-        self.move_range = 20  # how far up/down to move
-        self.move_speed = 1.5  # how fast to move
+        self.move_range = 12  # how far up/down to move
+        self.move_speed = 0.5  # how fast to move
 
     def set_enemy_colour(self):
         if self.obstacle_type == 'ground':
@@ -72,9 +71,7 @@ class Enemy(Entity):
             self.coin.x -= value  # move left with the platform
             self.coin.actor.x = self.coin.x
 
-    def update_movement(self):
-    # Horizontal movement is already handled elsewhere.
-    
+    def update_movement(self):    
         # Floating-low oscillation
         if self.obstacle_type == "floating-low":
             self.y += self.direction * self.move_speed

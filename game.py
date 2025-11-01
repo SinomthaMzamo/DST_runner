@@ -25,7 +25,7 @@ class Game:
 
     def start_game(self):
         self.game_started = True
-        self.player.is_idleing = False
+        self.player.is_idling = False
         self.player.is_running = True
 
     def create_obstacle(self, obstacle_type=''):
