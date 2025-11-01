@@ -13,7 +13,7 @@ class Enemy(Entity):
         self.coin = None
         if self.obstacle_type == "platform" and random() < 0.8:  # 60% chance
             coin_y = self.y - 50  # float above the platform
-            print(f"Creating coin at ({self.x}, {coin_y}) for platform at y={self.y}")
+            # print(f"Creating coin at ({self.x}, {coin_y}) for platform at y={self.y}")
             self.coin = Coin({'x':self.x, 'y':coin_y, 'width':50, 'height':50}, CoinValues.GOLD)
 
         # Add sprite animations

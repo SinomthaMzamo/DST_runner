@@ -40,33 +40,41 @@ def on_mouse_down(pos):
             exit()  
 
 def on_key_down(key):
-        global game_state
+    global game_state
+    if not game.game_started:
+        if key == keys.SPACE:
+            game.start_game()
+            # update player state
+        return
 
-        if game_state == 'playing':
-            if game.control['game_over']:
-                if key == keys.SPACE:
-                    game.reset()
-                return
+    if game_state == 'playing':
+        if game.control['game_over']:
+            if key == keys.SPACE:
+                game.reset()
+            return
 
-        
-        
-        # Jump - only allow if not sliding
-        if key == keys.UP and not game.player.is_jumping and not game.player.is_sliding:
-            game.player.jump()
+    
+    
+    # Jump - only allow if not sliding
+    if key == keys.UP and not game.player.is_jumping and not game.player.is_sliding:
+        game.player.jump()
 
-        elif game_state == 'menu' and key == keys.RETURN:
-            game_state = 'playing'
+    elif game_state == 'menu' and key == keys.RETURN:
+        game_state = 'playing'
 
 def update():
         global score_counter 
+
+        game.player.update_animation()
+
+        if not game.game_started or game.control['game_over']:
+            return
         
         if game_state != 'playing':
             return
 
         if game.control['game_over']:
             return
-        
-        game.player.update_animation()
         
         # Increase the counter each frame
         score_counter += 1
@@ -104,7 +112,7 @@ def update():
         if game.obstacle_spawn_timer >= game.obstacle_spawn_interval:
             if game.control['score'] % 7 == 0 and game.control['score'] > 150 and random.random() < 0.85:
                 game.obstacles.append(game.create_obstacle(obstacle_type='platform'))
-                print("there's a platform!", game.control['score'], 'obs y:', game.obstacles[-1].y, 'actor y:', game.obstacles[-1].actor.y)
+                # print("there's a platform!", game.control['score'], 'obs y:', game.obstacles[-1].y, 'actor y:', game.obstacles[-1].actor.y)
             else:
                 game.obstacles.append(game.create_obstacle())
             game.obstacle_spawn_timer = 0
@@ -120,13 +128,18 @@ def draw():
         draw_menu()
         return
 
-    screen.fill((34, 32, 64))  # Sky blue
+    screen.fill((34, 32, 64))  # Night Sky blue
     # Draw ground grass
     screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 40,Game.WIDTH, Game.HEIGHT - game.control['ground_y'] - 40), (44, 80, 44))
     # Draw ground soil
     screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 80,Game.WIDTH, Game.HEIGHT), (60, 40, 20))
 
     game.player.actor.draw()
+
+    if not game.game_started:
+        screen.draw.text("Press SPACE to start", center=(Game.WIDTH // 2, Game.HEIGHT // 2),
+                         color="white", fontsize=40)
+        return
 
     # Draw obstacles
     for obs in game.obstacles:

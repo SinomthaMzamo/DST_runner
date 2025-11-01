@@ -20,6 +20,12 @@ class Game:
         }
         self.player = player
         self.collected_coins = 0
+        self.game_started = False
+
+    def start_game(self):
+        self.game_started = True
+        self.player.is_idleing = False
+        self.player.is_running = True
 
     def create_obstacle(self, obstacle_type=''):
         obstacle_type = random.choice(['ground', 'floating', 'floating-low']) if obstacle_type != 'platform' else  'platform'
@@ -57,6 +63,7 @@ class Game:
     def reset(self):
         self.obstacles = []
         self.control['score'] = 0
+        self.collected_coins = 0
         self.control['game_over'] = False
         self.player.reset_state()
         self.obstacle_spawn_timer = 0
