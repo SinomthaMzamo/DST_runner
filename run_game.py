@@ -4,6 +4,34 @@ import random
 from entities.player import Player
 from game import Game
 
+# === Audio Manager ===
+class AudioManager:
+    def __init__(self, sounds, music):
+        self.sounds = sounds
+        self.music = music
+        self.sound_enabled = True
+        self.music_enabled = True
+        
+    def play_sound(self, sound_name):
+        if self.sound_enabled:
+            getattr(self.sounds, sound_name).play()
+    
+    def play_music(self, track_name, volume=0.5):
+        if self.music_enabled:
+            self.music.play(track_name)
+            self.music.set_volume(volume)
+    
+    def toggle_sound(self):
+        self.sound_enabled = not self.sound_enabled
+        
+    def toggle_music(self):
+        self.music_enabled = not self.music_enabled
+        if not self.music_enabled:
+            self.music.stop()
+        else:
+            # Resume music based on game state
+            audio_manager.play_music('bg_music_welcome', 0.1)
+
 player_configuration = {
     'x': 150,
     'y': 300,
@@ -28,34 +56,41 @@ sound_button = Rect(BUTTON_X, VERTICAL_OFFSET, BUTTON_WIDTH//2 - 5, STANDARD_BUT
 music_button = Rect(BUTTON_X + BUTTON_WIDTH//2 + 5, VERTICAL_OFFSET, BUTTON_WIDTH//2 - 5, STANDARD_BUTTON_HEIGHT)
 exit_button = Rect(BUTTON_X, VERTICAL_OFFSET+STANDARD_BUTTON_HEIGHT+VERTICAL_BUTTON_GAP, BUTTON_WIDTH, STANDARD_BUTTON_HEIGHT)
 
-sound_on = True
-music_on = True
+# --- IN-GAME MENU BUTTON ---
+menu_button = Rect(Game.WIDTH - 120, 10, 100, 40)
 
-game = Game(Player(player_configuration), sounds)
+audio_manager = AudioManager(sounds, music)
+game = Game(Player(player_configuration), audio_manager)
 
-music.play('bg_music_welcome')
-music.set_volume(0.1)
+
+audio_manager.play_music('bg_music_welcome', 0.1)
 
 def on_mouse_down(pos):
-    global game_state, sound_on, music_on
+    global game_state
 
     if game_state == "menu":
         if start_button.collidepoint(pos):
             game_state = "playing"
         elif sound_button.collidepoint(pos):
-            sound_on = not sound_on
+            audio_manager.toggle_sound()
         elif music_button.collidepoint(pos):
-            music_on = not music_on
+            audio_manager.toggle_music()
         elif exit_button.collidepoint(pos):
-            exit()  
+            exit()
+
+    elif game_state == "playing":
+        if menu_button.collidepoint(pos):
+            game.reset()
+            audio_manager.music.stop()
+            audio_manager.play_music('bg_music_welcome', 0.1)
+            game_state = "menu"
 
 def on_key_down(key):
     global game_state
     if not game.game_started:
         if key == keys.SPACE:
             game.start_game()
-            music.play('bg_music_playing')
-            music.set_volume(0.5)
+            audio_manager.play_music('bg_music_playing', 0.1)
         return
 
     if game_state == 'playing':
@@ -69,7 +104,7 @@ def on_key_down(key):
     # Jump - only allow if not sliding
     if key == keys.UP and not game.player.is_jumping and not game.player.is_sliding:
         game.player.jump()
-        sounds.jump.play()
+        audio_manager.play_sound('jump')
 
     elif game_state == 'menu' and key == keys.RETURN:
         game_state = 'playing'
@@ -111,7 +146,7 @@ def update():
         if keyboard.down and not game.player.is_jumping:
             game.player.set_is_sliding(True) 
             game.player.update_state('is_running')
-            sounds.slide.play()
+            audio_manager.play_sound('slide')
         else:
             game.player.set_is_sliding(False) 
 
@@ -145,6 +180,9 @@ def draw():
     if not game.game_started:
         screen.draw.text("Press SPACE to start", center=(Game.WIDTH // 2, Game.HEIGHT // 2),
                          color="white", fontsize=40)
+        # Draw Menu Button
+        screen.draw.filled_rect(menu_button, (100, 100, 180))
+        screen.draw.text("Menu", center=menu_button.center, color="white", fontsize=30)
         return
 
     # Draw obstacles
@@ -159,6 +197,10 @@ def draw():
     screen.draw.text(f"Score: {int(game.control['score'])}", (10, 10), color='whitesmoke', fontsize=30)
     screen.draw.text(f"Vault Balance: {int(game.collected_coins)}", (Game.WIDTH // 2, 10), color='whitesmoke', fontsize=30)
     screen.draw.text("UP: Jump  DOWN: Slide", (10, 50), color='whitesmoke', fontsize=20)
+    # Draw Menu Button
+    screen.draw.filled_rect(menu_button, (100, 100, 180))
+    screen.draw.text("Menu", center=menu_button.center, color="white", fontsize=30)
+
 
     if game.control['game_over']:
         screen.draw.text("GAME OVER", center=(Game.WIDTH // 2, Game.HEIGHT // 2 - 30), 
@@ -175,10 +217,10 @@ def draw_menu():
     screen.draw.text("Start Game", center=start_button.center, color="black", fontsize=40)
 
     screen.draw.filled_rect(sound_button, (180, 180, 180))
-    screen.draw.text(f"Sound: {'On' if sound_on else 'Off'}", center=sound_button.center, color="black", fontsize=30)
+    screen.draw.text(f"Sound: {'On' if audio_manager.sound_enabled else 'Off'}", center=sound_button.center, color="black", fontsize=30)
 
     screen.draw.filled_rect(music_button, (180, 180, 180))
-    screen.draw.text(f"Music: {'On' if music_on else 'Off'}", center=music_button.center, color="black", fontsize=30)
+    screen.draw.text(f"Music: {'On' if audio_manager.music_enabled else 'Off'}", center=music_button.center, color="black", fontsize=30)
 
     screen.draw.filled_rect(exit_button, (200, 100, 100))
     screen.draw.text("Exit", center=exit_button.center, color="white", fontsize=40)
