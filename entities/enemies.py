@@ -5,11 +5,11 @@ from random import random
 
 
 class Enemy(Entity):
-    def __init__(self, configuration, obstacle_type, audio_manager):
+    def __init__(self, configuration, obstacle_type):
         super().__init__(configuration)
         self.obstacle_type = obstacle_type
         self.coin = None
-        self.set_coin(audio_manager)
+        self.set_coin()
 
         # Add sprite animations
         self.floating_frames = ['enemy-blackhole1.png', 'enemy-blackhole2.png', 'enemy-blackhole3.png', 'enemy-blackhole4.png', 'enemy-blackhole5.png']
@@ -28,10 +28,10 @@ class Enemy(Entity):
         self.move_range = 12  # how far up/down to move
         self.move_speed = 0.5  # how fast to move
 
-    def set_coin(self, audio_manager):
+    def set_coin(self):
         if self.obstacle_type == "platform" and random() < 0.8:  
             coin_y = self.y - 50  
-            self.coin = Coin({'x':self.x, 'y':coin_y, 'width':50, 'height':50}, CoinValues.GOLD, audio_manager)
+            self.coin = Coin({'x':self.x, 'y':coin_y, 'width':50, 'height':50}, CoinValues.GOLD)
         
     def get_frames_for_type(self):
         if self.obstacle_type == 'floating':

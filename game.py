@@ -58,7 +58,7 @@ class Game:
         }
 
         obstacle_configuration = obstacle_configurations[obstacle_type]
-        obstacle = Enemy(obstacle_configuration, obstacle_type, self.audio_manager)
+        obstacle = Enemy(obstacle_configuration, obstacle_type)
         return obstacle
     
     def spawn_obstacles(self):
@@ -127,7 +127,10 @@ class Game:
                     self.audio_manager.play_sound('lose')
 
             if obs.coin and not obs.coin.collected and player_rect.colliderect(obs.coin.actor._rect):
-                self.collected_coins += obs.coin.collect()
+                value_collected = obs.coin.collect()
+                if value_collected:
+                    self.audio_manager.play_sound('collect')
+                    self.collected_coins += value_collected
 
 
         
