@@ -25,7 +25,7 @@ class Enemy(Entity):
         # For floating movement
         self.initial_y = self.y
         self.direction = 1  # 1 = up, -1 = down
-        self.move_range = 12  # how far up/down to move
+        self.move_range = 20  # how far up/down to move
         self.move_speed = 0.5  # how fast to move
 
     def set_coin(self):
@@ -64,7 +64,7 @@ class Enemy(Entity):
 
     def update_movement(self):    
         # Floating-low oscillation
-        if self.obstacle_type == "floating-low":
+        if self.obstacle_type == "floating-low" or self.obstacle_type == "floating":
             self.y += self.direction * self.move_speed
             if abs(self.y - self.initial_y) > self.move_range:
                 self.direction *= -1  # reverse direction

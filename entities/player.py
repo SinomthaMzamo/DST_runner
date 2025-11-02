@@ -36,6 +36,13 @@ class Player(Entity):
         self.frame_delay = 6
         self.frame_counter = 0
 
+    def idle(self):
+        self.vertical_velocity = 0
+        self.is_jumping = False
+        self.is_sliding = False 
+        self.is_running = False
+        self.is_idling = True
+
     def update_state(self, attribute):
         if attribute == 'is_running':
             self.is_running = not self.is_running
@@ -71,11 +78,8 @@ class Player(Entity):
 
     def reset_state(self):
         self.set_y_position(Player.DEFAULT_Y_POSITION)
-        self.vertical_velocity = 0
-        self.is_jumping = False
-        self.is_sliding = False 
-        self.is_running = False
-        self.is_idling = True
+        self.actor.y = self.y
+        self.idle()
 
     def accelerate(self, gravity):
         self.vertical_velocity += gravity

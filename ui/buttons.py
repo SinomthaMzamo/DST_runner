@@ -1,6 +1,6 @@
 # ui/buttons.py
 from pgzero.rect import Rect
-from game import Game
+from constants import WIDTH, HEIGHT
 
 # === MENU LAYOUT CONSTANTS ===
 BUTTON_X = 250
@@ -36,4 +36,4 @@ exit_button = Rect(
 )
 
 # === IN-GAME MENU BUTTON ===
-menu_button = Rect(Game.WIDTH - 120, 10, 100, 40)
+menu_button = Rect(WIDTH - 120, 10, 100, 40)

@@ -2,26 +2,21 @@ import random
 from entities.enemies import Enemy
 from entities.player import Player
 from pygame import Rect
+from constants import control, obstacle_configurations
 
 class Game:
-    WIDTH = 800
-    HEIGHT = 400
 
     def __init__(self, player:Player, audio_manager):
         self.obstacles:list[Enemy] = []
         self.obstacle_spawn_timer = 0
         self.obstacle_spawn_interval = 90
-        self.control = {
-            'ground_y': 290,
-            'game_speed': 5,
-            'score': 0,
-            'game_over': False,
-            'player_gravity': 0.8,
-        }
+        self.control = control
         self.player = player
         self.collected_coins = 0
         self.game_started = False
         self.audio_manager = audio_manager
+
+    
 
     def start_game(self):
         self.game_started = True
@@ -30,33 +25,6 @@ class Game:
 
     def create_obstacle(self, obstacle_type=''):
         obstacle_type = random.choice(['ground', 'floating', 'floating-low']) if obstacle_type != 'platform' else  'platform'
-        obstacle_configurations = {
-            'ground': {
-                'x': Game.WIDTH,
-                'y': self.control['ground_y']+10,
-                'width': 40,
-                'height': 60,
-            },
-            'floating-low': {
-                'x': Game.WIDTH,
-                'y': 280,
-                'width': 50,
-                'height': 50,
-            },
-            'floating': {
-                'x': Game.WIDTH,
-                'y': 260,
-                'width': 50,
-                'height': 60,
-            },
-            'platform': {
-                'x': Game.WIDTH,
-                'y': 260,
-                'width': 50,
-                'height': 60,
-            }
-        }
-
         obstacle_configuration = obstacle_configurations[obstacle_type]
         obstacle = Enemy(obstacle_configuration, obstacle_type)
         return obstacle

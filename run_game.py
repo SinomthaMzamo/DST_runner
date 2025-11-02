@@ -5,7 +5,7 @@ from entities.player import Player
 from game import Game
 from ui.buttons import (start_button, sound_button, music_button, exit_button, menu_button)
 from ui.colours import *
-from constants import player_configuration
+from constants import player_configuration, HEIGHT, WIDTH
 
 # === Audio Manager ===
 class AudioManager:
@@ -103,11 +103,12 @@ def update():
     global score_counter 
 
     game.player.update_animation()
-    if not game.game_started or game.control['game_over']:
+    if not game.game_started:
         return
     if game_state != 'playing':
         return
     if game.control['game_over']:
+        game.player.idle()
         return
     
     set_difficulty(game, 500, 0.4)
@@ -141,13 +142,13 @@ def draw():
         return
 
     screen.fill(SKY_COLOUR)
-    screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 40,Game.WIDTH, Game.HEIGHT - game.control['ground_y'] - 40), GROUND_TOP)
-    screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 80,Game.WIDTH, Game.HEIGHT), GROUND_BOTTOM)
+    screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 40, WIDTH, HEIGHT - game.control['ground_y'] - 40), GROUND_TOP)
+    screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 80, WIDTH, HEIGHT), GROUND_BOTTOM)
 
     game.player.actor.draw()
 
     if not game.game_started:
-        screen.draw.text("Press SPACE to start", center=(Game.WIDTH // 2, Game.HEIGHT // 2), color="white", fontsize=40)
+        screen.draw.text("Press SPACE to start", center=(WIDTH // 2, HEIGHT // 2), color="white", fontsize=40)
         # Draw Menu Button
         screen.draw.filled_rect(menu_button, BLUE)
         screen.draw.text("Menu", center=menu_button.center, color="white", fontsize=30)
@@ -163,21 +164,21 @@ def draw():
         # screen.draw.rect(game.player.actor._rect, (0, 255, 0))
 
     screen.draw.text(f"Score: {int(game.control['score'])}", (10, 10), color='whitesmoke', fontsize=30)
-    screen.draw.text(f"Vault Balance: {int(game.collected_coins)}", (Game.WIDTH // 2, 10), color='whitesmoke', fontsize=30)
+    screen.draw.text(f"Vault Balance: {int(game.collected_coins)}", (WIDTH // 2, 10), color='whitesmoke', fontsize=30)
     screen.draw.text("UP: Jump  DOWN: Slide", (10, 50), color='whitesmoke', fontsize=20)
     screen.draw.filled_rect(menu_button, BLUE)
     screen.draw.text("Menu", center=menu_button.center, color="white", fontsize=30)
 
 
     if game.control['game_over']:
-        screen.draw.text("GAME OVER", center=(Game.WIDTH // 2, Game.HEIGHT // 2 - 30), 
+        screen.draw.text("GAME OVER", center=(WIDTH // 2, HEIGHT // 2 - 30), 
                         color='firebrick', fontsize=60)
-        screen.draw.text("Press SPACE to restart", center=(Game.WIDTH // 2, Game.HEIGHT // 2 + 30), 
+        screen.draw.text("Press SPACE to restart", center=(WIDTH // 2, HEIGHT // 2 + 30), 
                         color='thistle', fontsize=30)
         
 def draw_menu():
     screen.fill(MENU_BG_COLOUR)
-    screen.draw.text("🚀 SPACE RUNNER 🚀", center=(Game.WIDTH // 2, 100), color="white", fontsize=60)
+    screen.draw.text("🚀 SPACE RUNNER 🚀", center=(WIDTH // 2, 100), color="white", fontsize=60)
 
     screen.draw.filled_rect(start_button, GREEN)
     screen.draw.text("Start Game", center=start_button.center, color="black", fontsize=40)
