@@ -4,6 +4,7 @@ Libraries used:
     1. pgzrun
     2. random
     3. pygame.Rect
+    4. os
 
 Running the project
     1. install python: https://www.python.org/downloads/

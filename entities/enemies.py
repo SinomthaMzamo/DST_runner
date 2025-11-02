@@ -64,6 +64,9 @@ class Enemy(Entity):
     def update_movement(self):    
         # Floating-low oscillation
         if self.obstacle_type == "floating-low" or self.obstacle_type == "floating":
+            if self.obstacle_type == "floating":
+                self.move_range = 35
+                self.move_speed = 0.7
             self.y += self.direction * self.move_speed
             if abs(self.y - self.initial_y) > self.move_range:
                 self.direction *= -1  # reverse direction

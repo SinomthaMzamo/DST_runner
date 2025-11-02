@@ -57,7 +57,7 @@ class Game:
         thresholds = {
             'ground': 25,
             'floating-low': 30,
-            'floating': 15,
+            'floating': 20,
             'platform': 15
         }
 
