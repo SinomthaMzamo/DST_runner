@@ -2,7 +2,7 @@ import random
 from entities.enemies import Enemy
 from entities.player import Player
 from pygame import Rect
-from constants import control, obstacle_configurations
+from constants import control, obstacle_configurations, COIN_ALLOCATION_ODDS, SCORE_COIN_ALLOCATION_THRESHOLD, SCORE_DIVISIBILITY
 
 class Game:
 
@@ -29,11 +29,14 @@ class Game:
         obstacle = Enemy(obstacle_configuration, obstacle_type)
         return obstacle
     
+    def coin_allocation_odds(self):
+        return self.control['score'] % SCORE_DIVISIBILITY == 0 and self.control['score'] > SCORE_COIN_ALLOCATION_THRESHOLD and random.random() < COIN_ALLOCATION_ODDS
+    
     def spawn_obstacles(self):
         # Spawn obstacles
         self.obstacle_spawn_timer += 1
         if self.obstacle_spawn_timer >= self.obstacle_spawn_interval:
-            if self.control['score'] % 7 == 0 and self.control['score'] > 30 and random.random() < 0.85:
+            if self.coin_allocation_odds():
                 self.obstacles.append(self.create_obstacle(obstacle_type='platform'))
             else:
                 self.obstacles.append(self.create_obstacle())

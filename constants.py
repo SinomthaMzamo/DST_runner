@@ -1,6 +1,10 @@
 WIDTH = 800
 HEIGHT = 500
 
+COIN_ALLOCATION_ODDS = 0.85
+SCORE_COIN_ALLOCATION_THRESHOLD = 30
+SCORE_DIVISIBILITY = 7
+
 player_configuration = {
     'x': 150,
     'y': 300,
