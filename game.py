@@ -2,7 +2,7 @@ import random
 from entities.enemies import Enemy
 from entities.player import Player
 from pygame import Rect
-from constants import control, obstacle_configurations, CoinAllocation
+from constants import obstacle_configurations, CoinAllocation
 
 class Game:
 
@@ -10,7 +10,6 @@ class Game:
         self.obstacles:list[Enemy] = []
         self.obstacle_spawn_timer = 0
         self.obstacle_spawn_interval = 90
-        self.control = control
         self.game_over = False
         self.game_speed = 5
         self.player_gravity = 0.8
