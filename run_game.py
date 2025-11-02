@@ -3,13 +3,12 @@ import os
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 import pgzrun
-import random
 
 from entities.player import Player
 from game import Game
 from ui.buttons import (start_button, sound_button, music_button, exit_button, menu_button)
 from ui.colours import *
-from constants import player_configuration, HEIGHT, WIDTH
+from constants import player_configuration, HEIGHT, WIDTH, GameSettings
 
 # === Audio Manager ===
 class AudioManager:
@@ -83,7 +82,7 @@ def on_key_down(key):
         return
 
     if game_state == 'playing':
-        if game.control['game_over']:
+        if game.game_over:
             if key == keys.SPACE:
                 game.reset()
             return
@@ -96,8 +95,8 @@ def on_key_down(key):
         game_state = 'playing'
 
 def set_difficulty(game, interval, speed_increase_factor):
-     if game.control['score'] % interval == 0:
-            game.control['game_speed'] += speed_increase_factor
+     if game.score % interval == 0:
+            game.game_speed += speed_increase_factor
 
 def record_score():
     global score_counter
@@ -107,7 +106,7 @@ def record_score():
 
     # Update the score only every `score_delay` frames
     if score_counter >= score_delay:
-        game.control['score'] += 1
+        game.score += 1
         score_counter = 0  # reset counter
 
 def update():
@@ -118,7 +117,7 @@ def update():
         return
     if game_state != 'playing':
         return
-    if game.control['game_over']:
+    if game.game_over:
         game.player.idle()
         return
     
@@ -133,7 +132,7 @@ def update():
         game.player.set_is_sliding(False) 
 
     if not game.player.is_sliding:
-        game.player.accelerate(game.control['player_gravity'])
+        game.player.accelerate(game.player_gravity)
         if game.player.y >= Player.DEFAULT_Y_POSITION:
             game.player.land()
     else:
@@ -162,8 +161,8 @@ def draw():
         return
 
     draw_gradient(SKY_COLOUR)
-    screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 40, WIDTH, HEIGHT - game.control['ground_y'] - 40), GROUND_TOP)
-    screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 80, WIDTH, HEIGHT), GROUND_BOTTOM)
+    screen.draw.filled_rect(Rect(0, GameSettings.GROUND_Y + 40, WIDTH, HEIGHT - GameSettings.GROUND_Y - 40), GROUND_TOP)
+    screen.draw.filled_rect(Rect(0, GameSettings.GROUND_Y + 80, WIDTH, HEIGHT), GROUND_BOTTOM)
 
     game.player.actor.draw()
 
@@ -180,14 +179,14 @@ def draw():
             obs.coin.draw()
         obs.actor.draw()
 
-    screen.draw.text(f"Score: {int(game.control['score'])}", (10, 10), color='whitesmoke', fontsize=30)
+    screen.draw.text(f"Score: {int(game.score)}", (10, 10), color='whitesmoke', fontsize=30)
     screen.draw.text(f"Vault Balance: {int(game.collected_coins)}", (WIDTH // 2, 10), color='whitesmoke', fontsize=30)
     screen.draw.text("UP: Jump  DOWN: Slide", (10, 50), color='whitesmoke', fontsize=20)
     screen.draw.filled_rect(menu_button, BLUE)
     screen.draw.text("Menu", center=menu_button.center, color="white", fontsize=30)
 
 
-    if game.control['game_over']:
+    if game.game_over:
         screen.draw.text("GAME OVER", center=(WIDTH // 2, HEIGHT // 2 - 30), 
                         color='firebrick', fontsize=60)
         screen.draw.text("Press SPACE to restart", center=(WIDTH // 2, HEIGHT // 2 + 30), 

@@ -97,10 +97,4 @@ class Player(Entity):
         self.vertical_velocity = self.jump_speed
         self.is_jumping = True
 
-    def __str__(self):
-        return (
-            f"Player(x={self.x}, y={self.y}, width={self.width}, height={self.height}, "
-            f"is_jumping={self.is_jumping}, is_sliding={self.is_sliding}, "
-            f"is_running={self.is_running}, is_idling={self.is_idling}, "
-            f"vertical_velocity={self.vertical_velocity}, current_frame={self.current_frame})"
-        )
+    

@@ -2,7 +2,7 @@ import random
 from entities.enemies import Enemy
 from entities.player import Player
 from pygame import Rect
-from constants import control, obstacle_configurations, COIN_ALLOCATION_ODDS, SCORE_COIN_ALLOCATION_THRESHOLD, SCORE_DIVISIBILITY
+from constants import control, obstacle_configurations, CoinAllocation
 
 class Game:
 
@@ -11,7 +11,11 @@ class Game:
         self.obstacle_spawn_timer = 0
         self.obstacle_spawn_interval = 90
         self.control = control
+        self.game_over = False
+        self.game_speed = 5
+        self.player_gravity = 0.8
         self.player = player
+        self.score = 0
         self.collected_coins = 0
         self.game_started = False
         self.audio_manager = audio_manager
@@ -30,7 +34,9 @@ class Game:
         return obstacle
     
     def coin_allocation_odds(self):
-        return self.control['score'] % SCORE_DIVISIBILITY == 0 and self.control['score'] > SCORE_COIN_ALLOCATION_THRESHOLD and random.random() < COIN_ALLOCATION_ODDS
+        return self.score % CoinAllocation.SCORE_DIVISIBILITY == 0 \
+            and self.score > CoinAllocation.SCORE_COIN_ALLOCATION_THRESHOLD \
+            and random.random() < CoinAllocation.COIN_ALLOCATION_ODDS
     
     def spawn_obstacles(self):
         # Spawn obstacles
@@ -45,12 +51,12 @@ class Game:
 
     def reset(self):
         self.obstacles = []
-        self.control['score'] = 0
+        self.score = 0
         self.collected_coins = 0
-        self.control['game_over'] = False
+        self.game_over = False
         self.player.reset_state()
         self.obstacle_spawn_timer = 0
-        self.control['game_speed'] = 5
+        self.game_speed = 5
         self.game_started = False
 
     def update_obstacles(self):
@@ -62,7 +68,7 @@ class Game:
         }
 
         for obs in self.obstacles[:]:
-            obs.update_x_position(self.control['game_speed'])
+            obs.update_x_position(self.game_speed)
             obs.update_movement()
             obs.update_enemy_frames()
 
@@ -93,7 +99,7 @@ class Game:
                 if obs.obstacle_type == 'platform':
                     self.player.land(Player.CLOUD_Y_POSITION)
                 else:
-                    self.control['game_over'] = True
+                    self.game_over = True
                     self.audio_manager.play_sound('collide', override=True)
                     self.audio_manager.play_sound('lose')
 

@@ -1,9 +1,17 @@
 WIDTH = 800
-HEIGHT = 500
+HEIGHT = 500    
 
-COIN_ALLOCATION_ODDS = 0.85
-SCORE_COIN_ALLOCATION_THRESHOLD = 30
-SCORE_DIVISIBILITY = 7
+class CoinAllocation:
+    COIN_ALLOCATION_ODDS = 0.85
+    SCORE_COIN_ALLOCATION_THRESHOLD = 30
+    SCORE_DIVISIBILITY = 4
+
+class PlayerConfiguration:
+    x = 150
+    y = 300
+    WIDTH = 40
+    HEIGHT = 80
+
 
 player_configuration = {
     'x': 150,
@@ -11,6 +19,12 @@ player_configuration = {
     'width': 40,
     'height': 80,
 }
+
+class GameSettings:
+    GROUND_Y = 290
+    GAME_SPEED = 5
+    GAME_OVER = False
+    PLAYER_GRAVITY = 0.8
 
 control = {
     'ground_y': 290,
@@ -23,19 +37,19 @@ control = {
 obstacle_configurations = {
     'ground': {
         'x': WIDTH,
-        'y': control['ground_y']+10,
+        'y': GameSettings.GROUND_Y+10,
         'width': 40,
         'height': 60,
     },
     'floating-low': {
         'x': WIDTH,
-        'y': control['ground_y']-10,
+        'y': GameSettings.GROUND_Y-10,
         'width': 50,
         'height': 50,
     },
     'floating': {
         'x': WIDTH,
-        'y': control['ground_y']-25,
+        'y': GameSettings.GROUND_Y-25,
         'width': 50,
         'height': 60,
     },
