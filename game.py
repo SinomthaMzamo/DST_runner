@@ -104,4 +104,5 @@ class Game:
                     self.collected_coins += value_collected
 
 
-        
+    def dump_player(self):
+        return self.player.__str__()

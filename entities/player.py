@@ -1,14 +1,7 @@
 from enum import Enum
 from .entity import Entity
 from pgzero.actor import Actor
-
-class PlayerState(Enum):
-    RUNNING = 'is_running',
-    SLIDING = 'is_sliding',
-    JUMPING = 'is_jumping',
-    IDLE = 'is_idle'    
-
-
+    
 class Player(Entity):
     ''' Class representing the player '''
     DEFAULT_Y_POSITION = 300
@@ -18,7 +11,6 @@ class Player(Entity):
     def __init__(self, configuration):
         super().__init__(configuration)
 
-        # Add player-specific attributes
         self.vertical_velocity = 0
         self.jump_speed = -15
         self.is_jumping = False
@@ -26,7 +18,6 @@ class Player(Entity):
         self.is_running = False
         self.is_idling = True    
 
-        # Add sprite animations
         self.running_frames = ['player-run024.png', 'player-run025.png', 'player-run026.png', 'player-run027.png', 'player-run028.png', 'player-run029.png', 'player-run030.png', 'player-run031.png']
         self.sliding_frames = ['player-slide10.png', 'player-slide11.png', 'player-slide12.png']
         self.jumping_frames = ['player-jump16.png', 'player-jump17.png', 'player-jump18.png', 'player-jump19.png', 'player-jump20.png']
@@ -105,3 +96,11 @@ class Player(Entity):
     def jump(self):
         self.vertical_velocity = self.jump_speed
         self.is_jumping = True
+
+    def __str__(self):
+        return (
+            f"Player(x={self.x}, y={self.y}, width={self.width}, height={self.height}, "
+            f"is_jumping={self.is_jumping}, is_sliding={self.is_sliding}, "
+            f"is_running={self.is_running}, is_idling={self.is_idling}, "
+            f"vertical_velocity={self.vertical_velocity}, current_frame={self.current_frame})"
+        )

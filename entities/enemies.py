@@ -11,7 +11,6 @@ class Enemy(Entity):
         self.coin = None
         self.set_coin()
 
-        # Add sprite animations
         self.floating_frames = ['enemy-blackhole1.png', 'enemy-blackhole2.png', 'enemy-blackhole3.png', 'enemy-blackhole4.png', 'enemy-blackhole5.png']
         self.floating_low_frames = ['enemy-debris1.png', 'enemy-debris2.png', 'enemy-debris3.png', 'enemy-debris4.png', 'enemy-debris5.png', 'enemy-debris6.png', 'enemy-debris7.png']
         self.ground_frames = ['enemy-volcano1.png', 'enemy-volcano2.png']

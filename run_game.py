@@ -128,13 +128,11 @@ def update():
     else:
         game.player.set_is_sliding(False) 
 
-    # Player physics
     if not game.player.is_sliding:
         game.player.accelerate(game.control['player_gravity'])
         if game.player.y >= Player.DEFAULT_Y_POSITION:
             game.player.land()
     else:
-        # Keep player low while sliding
         game.player.slide()
 
     # Spawn obstacles
@@ -177,9 +175,6 @@ def draw():
         if obs.coin:
             obs.coin.draw()
         obs.actor.draw()
-        # TODO: Debug outline for collisions
-        # screen.draw.rect(obs.actor._rect, (255, 0, 0))
-        # screen.draw.rect(game.player.actor._rect, (0, 255, 0))
 
     screen.draw.text(f"Score: {int(game.control['score'])}", (10, 10), color='whitesmoke', fontsize=30)
     screen.draw.text(f"Vault Balance: {int(game.collected_coins)}", (WIDTH // 2, 10), color='whitesmoke', fontsize=30)
