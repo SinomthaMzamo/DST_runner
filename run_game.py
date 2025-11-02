@@ -14,12 +14,19 @@ player_configuration = {
 score_counter = 0
 game_state = "menu"   # ← NEW
 
+BUTTON_X = 250
+BUTTON_Y = 200
+BUTTON_WIDTH = 300
+STANDARD_BUTTON_HEIGHT = 50
+START_BUTTON_HEIGHT = 60
+VERTICAL_BUTTON_GAP = 10
+VERTICAL_OFFSET = BUTTON_Y + START_BUTTON_HEIGHT + VERTICAL_BUTTON_GAP
 
 # --- MENU BUTTONS ---
-start_button = Rect(300, 180, 200, 60)
-sound_button = Rect(300, 260, 200, 50)
-music_button = Rect(300, 320, 200, 50)
-exit_button = Rect(300, 380, 200, 50)
+start_button = Rect(BUTTON_X, BUTTON_Y, BUTTON_WIDTH, START_BUTTON_HEIGHT)
+sound_button = Rect(BUTTON_X, VERTICAL_OFFSET, BUTTON_WIDTH//2 - 5, STANDARD_BUTTON_HEIGHT)
+music_button = Rect(BUTTON_X + BUTTON_WIDTH//2 + 5, VERTICAL_OFFSET, BUTTON_WIDTH//2 - 5, STANDARD_BUTTON_HEIGHT)
+exit_button = Rect(BUTTON_X, VERTICAL_OFFSET+STANDARD_BUTTON_HEIGHT+VERTICAL_BUTTON_GAP, BUTTON_WIDTH, STANDARD_BUTTON_HEIGHT)
 
 sound_on = True
 music_on = True
@@ -27,7 +34,7 @@ music_on = True
 game = Game(Player(player_configuration), sounds)
 
 music.play('bg_music_welcome')
-music.set_volume(0.5)
+music.set_volume(0.1)
 
 def on_mouse_down(pos):
     global game_state, sound_on, music_on
@@ -67,6 +74,21 @@ def on_key_down(key):
     elif game_state == 'menu' and key == keys.RETURN:
         game_state = 'playing'
 
+def set_difficulty(game, interval, speed_increase_factor):
+     if game.control['score'] % interval == 0:
+            game.control['game_speed'] += speed_increase_factor
+
+def record_score():
+    global score_counter
+
+    score_counter += 1
+    score_delay = 10  
+
+    # Update the score only every `score_delay` frames
+    if score_counter >= score_delay:
+        game.control['score'] += 1
+        score_counter = 0  # reset counter
+
 def update():
         global score_counter 
 
@@ -81,17 +103,9 @@ def update():
         if game.control['game_over']:
             return
         
-        score_counter += 1
-        score_delay = 10  
-
-        # Update the score only every `score_delay` frames
-        if score_counter >= score_delay:
-            game.control['score'] += 1
-            score_counter = 0  # reset counter
-        
         # Increase game speed gradually
-        if game.control['score'] % 500 == 0:
-            game.control['game_speed'] += 0.2
+        set_difficulty(game, 500, 0.4)
+        record_score()
 
         # Check if DOWN key is held for sliding
         if keyboard.down and not game.player.is_jumping:
@@ -105,23 +119,14 @@ def update():
         if not game.player.is_sliding:
             game.player.accelerate(game.control['player_gravity'])
 
-            # Ground collision
-            if game.player.y >= 300:
+            if game.player.y >= Player.DEFAULT_Y_POSITION:
                 game.player.land()
         else:
             # Keep player low while sliding
             game.player.slide()
 
         # Spawn obstacles
-        game.obstacle_spawn_timer += 1
-        if game.obstacle_spawn_timer >= game.obstacle_spawn_interval:
-            if game.control['score'] % 7 == 0 and game.control['score'] > 30 and random.random() < 0.85:
-                game.obstacles.append(game.create_obstacle(obstacle_type='platform'))
-            else:
-                game.obstacles.append(game.create_obstacle())
-            game.obstacle_spawn_timer = 0
-            game.obstacle_spawn_interval = random.randint(70, 110)
-
+        game.spawn_obstacles()
         game.update_obstacles()
 
 def draw():

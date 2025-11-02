@@ -61,6 +61,17 @@ class Game:
         obstacle = Enemy(obstacle_configuration, obstacle_type, self.sounds)
         return obstacle
     
+    def spawn_obstacles(self):
+        # Spawn obstacles
+        self.obstacle_spawn_timer += 1
+        if self.obstacle_spawn_timer >= self.obstacle_spawn_interval:
+            if self.control['score'] % 7 == 0 and self.control['score'] > 30 and random.random() < 0.85:
+                self.obstacles.append(self.create_obstacle(obstacle_type='platform'))
+            else:
+                self.obstacles.append(self.create_obstacle())
+            self.obstacle_spawn_timer = 0
+            self.obstacle_spawn_interval = random.randint(70, 110)
+
     def reset(self):
         self.obstacles = []
         self.control['score'] = 0
