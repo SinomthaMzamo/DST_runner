@@ -99,21 +99,26 @@ pgzrun run_game.py
 ## 📁 Project Structure
 
 ```
-SpaceRunner/
-│
-├── app/
-│   ├── run_game.py              # Entry point
-│   ├── game.py                  # Main game logic
-│   ├── entities/
-│   │   ├── player.py            # Player class and animations
-│   │   ├── enemies.py           # Enemy and obstacle logic
-│   │   ├── coin.py              # Coin logic and spin animation
-│   │   └── entity.py            # Base entity class
-│
-├── images/                      # Sprite and background images
-├── sounds/                      # Sound effects and background music
+app/
+├── __init__.py
+├── constants.py
+├── entities
+│   ├── __init__.py
+│   ├── enemies.py
+│   ├── entity.py
+│   ├── player.py
+│   └── rewards.py
+├── game.py
+├── images/
+├── music/
+├── README.md
+├── readme.txt
 ├── requirements.txt
-└── README.md
+├── run_game.py
+├── sounds/
+└── ui/
+    ├── buttons.py
+    └── colours.py
 ```
 
 ---
