@@ -81,6 +81,7 @@ class Game:
         self.player.reset_state()
         self.obstacle_spawn_timer = 0
         self.control['game_speed'] = 5
+        self.game_started = False
 
     def update_obstacles(self):
         # COLLISION_THRESHOLD = 20  # ← you can tweak this (5–15 is typical)

@@ -74,6 +74,8 @@ class Player(Entity):
         self.vertical_velocity = 0
         self.is_jumping = False
         self.is_sliding = False 
+        self.is_running = False
+        self.is_idling = True
 
     def accelerate(self, gravity):
         self.vertical_velocity += gravity
