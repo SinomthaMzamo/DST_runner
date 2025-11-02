@@ -15,11 +15,18 @@ class AudioManager:
         self.sound_enabled = True
         self.music_enabled = True
         
-    def play_sound(self, sound_name):
+    def play_sound(self, sound_name, override=False):
         if self.sound_enabled:
+            if override:
+                for s in self.sounds.__dict__.values():
+                    try:
+                        s.stop()
+                    except AttributeError:
+                        pass
             getattr(self.sounds, sound_name).play()
+
     
-    def play_music(self, track_name, volume=0.5):
+    def play_music(self, track_name, volume=0.2):
         if self.music_enabled:
             self.music.play(track_name)
             self.music.set_volume(volume)
@@ -41,7 +48,7 @@ game_state = "menu"
 audio_manager = AudioManager(sounds, music)
 game = Game(Player(player_configuration), audio_manager)
 
-audio_manager.play_music('bg_music_welcome', 0.1)
+audio_manager.play_music('bg_music_welcome', 0.2)
 
 def on_mouse_down(pos):
     global game_state
@@ -134,6 +141,17 @@ def update():
     game.spawn_obstacles()
     game.update_obstacles()
 
+def draw_gradient(colour):
+    screen.fill(colour)
+    for i in range(0, HEIGHT, 10):
+        # Slightly increase blue and decrease brightness as we go down
+        shade = (
+            max(0, colour[0] - i // 20),          # keep red low
+            max(0, colour[1] - i // 30),          # reduce green slowly
+            min(255, colour[2] + i // 15)         # increase blue slightly
+        )
+        screen.draw.filled_rect(Rect(0, i, WIDTH, 10), shade)
+
 def draw():
     screen.clear()
 
@@ -141,7 +159,7 @@ def draw():
         draw_menu()
         return
 
-    screen.fill(SKY_COLOUR)
+    draw_gradient(SKY_COLOUR)
     screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 40, WIDTH, HEIGHT - game.control['ground_y'] - 40), GROUND_TOP)
     screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 80, WIDTH, HEIGHT), GROUND_BOTTOM)
 
@@ -177,8 +195,9 @@ def draw():
                         color='thistle', fontsize=30)
         
 def draw_menu():
-    screen.fill(MENU_BG_COLOUR)
-    screen.draw.text("🚀 SPACE RUNNER 🚀", center=(WIDTH // 2, 100), color="white", fontsize=60)
+    draw_gradient(MENU_BG_COLOUR)
+
+    screen.draw.text("SPACE RUNNER", center=(WIDTH // 2, 100), color="white", fontsize=70)
 
     screen.draw.filled_rect(start_button, GREEN)
     screen.draw.text("Start Game", center=start_button.center, color="black", fontsize=40)

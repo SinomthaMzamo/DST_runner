@@ -94,7 +94,7 @@ class Game:
                     self.player.land(Player.CLOUD_Y_POSITION)
                 else:
                     self.control['game_over'] = True
-                    self.audio_manager.play_sound('collide')
+                    self.audio_manager.play_sound('collide', override=True)
                     self.audio_manager.play_sound('lose')
 
             if obs.coin and not obs.coin.collected and player_rect.colliderect(obs.coin.actor._rect):
