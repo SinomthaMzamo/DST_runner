@@ -70,8 +70,8 @@ pgzrun run_game.py
 
 | Key       | Action                     |
 | --------- | -------------------------- |
-| **UP**    | Jump                       |
-| **DOWN**  | Slide                      |
+| **UP**    | Jump over obstacles        |
+| **DOWN**  | Slide under obstacles      |
 | **SPACE** | Start / Restart the game   |
 
 ---
