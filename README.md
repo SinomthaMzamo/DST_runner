@@ -12,6 +12,7 @@ You play as a space explorer who must jump, slide, and dodge obstacles while col
 | **pgzrun** | Runs the game using the Pygame Zero engine. |
 | **random** | Generates randomness for obstacle and coin spawning. |
 | **pygame.Rect** | Used for collision detection between the player and obstacles. |
+| **os** | Used to centre the game window on the screen. |
 
 ---
 
