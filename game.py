@@ -21,7 +21,6 @@ class Game:
         self.player = player
         self.collected_coins = 0
         self.game_started = False
-        self.sounds = audio_manager.sounds
         self.audio_manager = audio_manager
 
     def start_game(self):
@@ -84,8 +83,6 @@ class Game:
         self.game_started = False
 
     def update_obstacles(self):
-        # COLLISION_THRESHOLD = 20  # ← you can tweak this (5–15 is typical)
-
         thresholds = {
             'ground': 25,
             'floating-low': 30,
@@ -98,18 +95,14 @@ class Game:
             obs.update_movement()
             obs.update_enemy_frames()
 
-            # Remove off-screen obstacles
             if obs.x < -obs.width:
                 self.obstacles.remove(obs)
                 continue
 
-            # Update actor position
             obs.actor.x = obs.x
             obs.actor.y = obs.y
-
             threshold = thresholds.get(obs.obstacle_type, 10)
 
-            # Get shrunk rectangles
             player_rect = Rect(
                 self.player.actor.x - self.player.actor.width / 2,
                 self.player.actor.y - self.player.actor.height / 2,
@@ -124,7 +117,6 @@ class Game:
                 obs.actor.height
             ).inflate(-threshold, -threshold)
 
-
             # ✅ Collision check with threshold
             if player_rect.colliderect(obs_rect):
                 if obs.obstacle_type == 'platform':
@@ -132,8 +124,6 @@ class Game:
                 else:
                     self.control['game_over'] = True
                     self.audio_manager.play_sound('collide')
-                    # self.sounds.collide.play()
-                    # self.sounds.lose.play()
                     self.audio_manager.play_sound('lose')
 
             if obs.coin and not obs.coin.collected and player_rect.colliderect(obs.coin.actor._rect):

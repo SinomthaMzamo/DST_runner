@@ -3,6 +3,9 @@ import random
 
 from entities.player import Player
 from game import Game
+from ui.buttons import (start_button, sound_button, music_button, exit_button, menu_button)
+from ui.colours import *
+from constants import player_configuration
 
 # === Audio Manager ===
 class AudioManager:
@@ -32,36 +35,11 @@ class AudioManager:
             # Resume music based on game state
             audio_manager.play_music('bg_music_welcome', 0.1)
 
-player_configuration = {
-    'x': 150,
-    'y': 300,
-    'width': 40,
-    'height': 80,
-    }
-
 score_counter = 0
-game_state = "menu"   # ← NEW
-
-BUTTON_X = 250
-BUTTON_Y = 200
-BUTTON_WIDTH = 300
-STANDARD_BUTTON_HEIGHT = 50
-START_BUTTON_HEIGHT = 60
-VERTICAL_BUTTON_GAP = 10
-VERTICAL_OFFSET = BUTTON_Y + START_BUTTON_HEIGHT + VERTICAL_BUTTON_GAP
-
-# --- MENU BUTTONS ---
-start_button = Rect(BUTTON_X, BUTTON_Y, BUTTON_WIDTH, START_BUTTON_HEIGHT)
-sound_button = Rect(BUTTON_X, VERTICAL_OFFSET, BUTTON_WIDTH//2 - 5, STANDARD_BUTTON_HEIGHT)
-music_button = Rect(BUTTON_X + BUTTON_WIDTH//2 + 5, VERTICAL_OFFSET, BUTTON_WIDTH//2 - 5, STANDARD_BUTTON_HEIGHT)
-exit_button = Rect(BUTTON_X, VERTICAL_OFFSET+STANDARD_BUTTON_HEIGHT+VERTICAL_BUTTON_GAP, BUTTON_WIDTH, STANDARD_BUTTON_HEIGHT)
-
-# --- IN-GAME MENU BUTTON ---
-menu_button = Rect(Game.WIDTH - 120, 10, 100, 40)
+game_state = "menu" 
 
 audio_manager = AudioManager(sounds, music)
 game = Game(Player(player_configuration), audio_manager)
-
 
 audio_manager.play_music('bg_music_welcome', 0.1)
 
@@ -98,10 +76,7 @@ def on_key_down(key):
             if key == keys.SPACE:
                 game.reset()
             return
-
     
-    
-    # Jump - only allow if not sliding
     if key == keys.UP and not game.player.is_jumping and not game.player.is_sliding:
         game.player.jump()
         audio_manager.play_sound('jump')
@@ -125,44 +100,38 @@ def record_score():
         score_counter = 0  # reset counter
 
 def update():
-        global score_counter 
+    global score_counter 
 
-        game.player.update_animation()
+    game.player.update_animation()
+    if not game.game_started or game.control['game_over']:
+        return
+    if game_state != 'playing':
+        return
+    if game.control['game_over']:
+        return
+    
+    set_difficulty(game, 500, 0.4)
+    record_score()
 
-        if not game.game_started or game.control['game_over']:
-            return
-        
-        if game_state != 'playing':
-            return
+    if keyboard.down and not game.player.is_jumping:
+        game.player.set_is_sliding(True) 
+        game.player.update_state('is_running')
+        audio_manager.play_sound('slide')
+    else:
+        game.player.set_is_sliding(False) 
 
-        if game.control['game_over']:
-            return
-        
-        # Increase game speed gradually
-        set_difficulty(game, 500, 0.4)
-        record_score()
+    # Player physics
+    if not game.player.is_sliding:
+        game.player.accelerate(game.control['player_gravity'])
+        if game.player.y >= Player.DEFAULT_Y_POSITION:
+            game.player.land()
+    else:
+        # Keep player low while sliding
+        game.player.slide()
 
-        # Check if DOWN key is held for sliding
-        if keyboard.down and not game.player.is_jumping:
-            game.player.set_is_sliding(True) 
-            game.player.update_state('is_running')
-            audio_manager.play_sound('slide')
-        else:
-            game.player.set_is_sliding(False) 
-
-        # Player physics
-        if not game.player.is_sliding:
-            game.player.accelerate(game.control['player_gravity'])
-
-            if game.player.y >= Player.DEFAULT_Y_POSITION:
-                game.player.land()
-        else:
-            # Keep player low while sliding
-            game.player.slide()
-
-        # Spawn obstacles
-        game.spawn_obstacles()
-        game.update_obstacles()
+    # Spawn obstacles
+    game.spawn_obstacles()
+    game.update_obstacles()
 
 def draw():
     screen.clear()
@@ -171,17 +140,16 @@ def draw():
         draw_menu()
         return
 
-    screen.fill((34, 32, 64))
-    screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 40,Game.WIDTH, Game.HEIGHT - game.control['ground_y'] - 40), (44, 80, 44))
-    screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 80,Game.WIDTH, Game.HEIGHT), (60, 40, 20))
+    screen.fill(SKY_COLOUR)
+    screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 40,Game.WIDTH, Game.HEIGHT - game.control['ground_y'] - 40), GROUND_TOP)
+    screen.draw.filled_rect(Rect(0, game.control['ground_y'] + 80,Game.WIDTH, Game.HEIGHT), GROUND_BOTTOM)
 
     game.player.actor.draw()
 
     if not game.game_started:
-        screen.draw.text("Press SPACE to start", center=(Game.WIDTH // 2, Game.HEIGHT // 2),
-                         color="white", fontsize=40)
+        screen.draw.text("Press SPACE to start", center=(Game.WIDTH // 2, Game.HEIGHT // 2), color="white", fontsize=40)
         # Draw Menu Button
-        screen.draw.filled_rect(menu_button, (100, 100, 180))
+        screen.draw.filled_rect(menu_button, BLUE)
         screen.draw.text("Menu", center=menu_button.center, color="white", fontsize=30)
         return
 
@@ -197,8 +165,7 @@ def draw():
     screen.draw.text(f"Score: {int(game.control['score'])}", (10, 10), color='whitesmoke', fontsize=30)
     screen.draw.text(f"Vault Balance: {int(game.collected_coins)}", (Game.WIDTH // 2, 10), color='whitesmoke', fontsize=30)
     screen.draw.text("UP: Jump  DOWN: Slide", (10, 50), color='whitesmoke', fontsize=20)
-    # Draw Menu Button
-    screen.draw.filled_rect(menu_button, (100, 100, 180))
+    screen.draw.filled_rect(menu_button, BLUE)
     screen.draw.text("Menu", center=menu_button.center, color="white", fontsize=30)
 
 
@@ -209,20 +176,19 @@ def draw():
                         color='thistle', fontsize=30)
         
 def draw_menu():
-    screen.fill((30, 30, 30))
+    screen.fill(MENU_BG_COLOUR)
     screen.draw.text("🚀 SPACE RUNNER 🚀", center=(Game.WIDTH // 2, 100), color="white", fontsize=60)
 
-    # Buttons
-    screen.draw.filled_rect(start_button, (100, 200, 100))
+    screen.draw.filled_rect(start_button, GREEN)
     screen.draw.text("Start Game", center=start_button.center, color="black", fontsize=40)
 
-    screen.draw.filled_rect(sound_button, (180, 180, 180))
+    screen.draw.filled_rect(sound_button, GRAY)
     screen.draw.text(f"Sound: {'On' if audio_manager.sound_enabled else 'Off'}", center=sound_button.center, color="black", fontsize=30)
 
-    screen.draw.filled_rect(music_button, (180, 180, 180))
+    screen.draw.filled_rect(music_button, GRAY)
     screen.draw.text(f"Music: {'On' if audio_manager.music_enabled else 'Off'}", center=music_button.center, color="black", fontsize=30)
 
-    screen.draw.filled_rect(exit_button, (200, 100, 100))
+    screen.draw.filled_rect(exit_button, RED)
     screen.draw.text("Exit", center=exit_button.center, color="white", fontsize=40)
 
 pgzrun.go()

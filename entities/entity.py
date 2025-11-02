@@ -5,9 +5,6 @@ class Entity:
         self.height = configuration['height']
         self.width = configuration['width']
 
-    def set_x_position(self, value):
-        self.x = value
-
     def set_y_position(self, value):
         self.y = value
 

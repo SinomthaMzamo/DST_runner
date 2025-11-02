@@ -8,12 +8,8 @@ class Enemy(Entity):
     def __init__(self, configuration, obstacle_type, audio_manager):
         super().__init__(configuration)
         self.obstacle_type = obstacle_type
-        self.color = self.set_enemy_colour()
-
         self.coin = None
-        if self.obstacle_type == "platform" and random() < 0.8:  
-            coin_y = self.y - 50  
-            self.coin = Coin({'x':self.x, 'y':coin_y, 'width':50, 'height':50}, CoinValues.GOLD, audio_manager)
+        self.set_coin(audio_manager)
 
         # Add sprite animations
         self.floating_frames = ['enemy-blackhole1.png', 'enemy-blackhole2.png', 'enemy-blackhole3.png', 'enemy-blackhole4.png', 'enemy-blackhole5.png']
@@ -32,15 +28,10 @@ class Enemy(Entity):
         self.move_range = 12  # how far up/down to move
         self.move_speed = 0.5  # how fast to move
 
-    def set_enemy_colour(self):
-        if self.obstacle_type == 'ground':
-            return (200, 50, 50)
-        if self.obstacle_type == 'floating-low':
-            return (10, 20, 200)
-        if self.obstacle_type == 'floating':
-            return (50, 50, 200)
-        if self.obstacle_type == 'platform':
-            return (255, 255, 255)
+    def set_coin(self, audio_manager):
+        if self.obstacle_type == "platform" and random() < 0.8:  
+            coin_y = self.y - 50  
+            self.coin = Coin({'x':self.x, 'y':coin_y, 'width':50, 'height':50}, CoinValues.GOLD, audio_manager)
         
     def get_frames_for_type(self):
         if self.obstacle_type == 'floating':
