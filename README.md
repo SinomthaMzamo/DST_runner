@@ -73,7 +73,6 @@ pgzrun run_game.py
 | **UP**    | Jump                       |
 | **DOWN**  | Slide                      |
 | **SPACE** | Start / Restart the game   |
-| **ESC**   | Exit menu or quit the game |
 
 ---
 
