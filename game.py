@@ -14,12 +14,31 @@ class Game:
         self.game_speed = 5
         self.player_gravity = 0.8
         self.player = player
-        self.score = 0
-        self.collected_coins = 0
+
+        self.round_score = 0
+        self.highscore = 0
+        self.has_achieved_new_high_score = False
+        self.round_collected_vault_balance = 0
+        self.total_collected_vault_balance = 0
+
         self.game_started = False
+        self.game_over_processed = False
         self.audio_manager = audio_manager
 
-    
+    def do_game_over(self):
+        if not self.game_over_processed:
+            self.total_collected_vault_balance += self.round_collected_vault_balance
+            if self.new_highscore():
+                self.update_highscore()
+                self.has_achieved_new_high_score = True
+
+        self.game_over_processed = True
+        
+    def update_highscore(self):
+        self.highscore = self.round_score
+
+    def new_highscore(self):
+        return self.round_score > self.highscore
 
     def start_game(self):
         self.game_started = True
@@ -33,8 +52,8 @@ class Game:
         return obstacle
     
     def coin_allocation_odds(self):
-        return self.score % CoinAllocation.SCORE_DIVISIBILITY == 0 \
-            and self.score > CoinAllocation.SCORE_COIN_ALLOCATION_THRESHOLD \
+        return self.round_score % CoinAllocation.SCORE_DIVISIBILITY == 0 \
+            and self.round_score > CoinAllocation.SCORE_COIN_ALLOCATION_THRESHOLD \
             and random.random() < CoinAllocation.COIN_ALLOCATION_ODDS
     
     def spawn_obstacles(self):
@@ -50,13 +69,15 @@ class Game:
 
     def reset(self):
         self.obstacles = []
-        self.score = 0
-        self.collected_coins = 0
+        self.round_score = 0
+        self.round_collected_vault_balance = 0
         self.game_over = False
         self.player.reset_state()
         self.obstacle_spawn_timer = 0
         self.game_speed = 5
         self.game_started = False
+        self.has_achieved_new_high_score = False
+        self.game_over_processed = False
 
     def update_obstacles(self):
         thresholds = {
@@ -106,7 +127,7 @@ class Game:
                 value_collected = obs.coin.collect()
                 if value_collected:
                     self.audio_manager.play_sound('collect')
-                    self.collected_coins += value_collected
+                    self.round_collected_vault_balance += value_collected
 
 
     def dump_player(self):

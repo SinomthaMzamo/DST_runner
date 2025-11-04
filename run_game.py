@@ -6,7 +6,7 @@ import pgzrun
 
 from entities.player import Player
 from game import Game
-from ui.buttons import (start_button, sound_button, music_button, exit_button, menu_button)
+from ui.buttons import (start_button, sound_button, music_button, exit_button, menu_button, missions_button, endless_button)
 from ui.colours import *
 from constants import player_configuration, HEIGHT, WIDTH, GameSettings
 
@@ -94,8 +94,8 @@ def on_key_down(key):
     elif game_state == 'menu' and key == keys.RETURN:
         game_state = 'playing'
 
-def set_difficulty(game, interval, speed_increase_factor):
-     if game.score % interval == 0:
+def set_difficulty(game: Game, interval, speed_increase_factor):
+     if game.round_score % interval == 0:
             game.game_speed += speed_increase_factor
 
 def record_score():
@@ -106,7 +106,7 @@ def record_score():
 
     # Update the score only every `score_delay` frames
     if score_counter >= score_delay:
-        game.score += 1
+        game.round_score += 1
         score_counter = 0  # reset counter
 
 def update():
@@ -179,8 +179,10 @@ def draw():
             obs.coin.draw()
         obs.actor.draw()
 
-    screen.draw.text(f"Score: {int(game.score)}", (10, 10), color='whitesmoke', fontsize=30)
-    screen.draw.text(f"Vault Balance: {int(game.collected_coins)}", (WIDTH // 2, 10), color='whitesmoke', fontsize=30)
+    screen.draw.text(f"Score: {int(game.round_score)}", (10, 10), color='whitesmoke', fontsize=30)
+    screen.draw.text(f"High Score: {int(game.highscore)}", (10, 30), color='whitesmoke', fontsize=30)
+    screen.draw.text(f"Round Balance: {int(game.round_collected_vault_balance)}", (WIDTH // 2, 10), color='whitesmoke', fontsize=30)
+    screen.draw.text(f"Vault Balance: {int(game.total_collected_vault_balance)}", (WIDTH // 2, 30), color='whitesmoke', fontsize=30)
     screen.draw.text("UP: Jump  DOWN: Slide", (10, 50), color='whitesmoke', fontsize=20)
     screen.draw.filled_rect(menu_button, BLUE)
     screen.draw.text("Menu", center=menu_button.center, color="white", fontsize=30)
@@ -189,7 +191,14 @@ def draw():
     if game.game_over:
         screen.draw.text("GAME OVER", center=(WIDTH // 2, HEIGHT // 2 - 30), 
                         color='firebrick', fontsize=60)
-        screen.draw.text("Press SPACE to restart", center=(WIDTH // 2, HEIGHT // 2 + 30), 
+        game.do_game_over()
+        if game.has_achieved_new_high_score:
+            screen.draw.text(f"New High Score: {game.highscore}", center=(WIDTH // 2, HEIGHT // 2 - 80), color='orange', fontsize=70)
+            screen.draw.text("Press SPACE to restart", center=(WIDTH // 2, HEIGHT // 2 + 30), 
+                        color='thistle', fontsize=30)
+            print(game.highscore, "HIGH SCORE!")
+        else:
+            screen.draw.text("Press SPACE to restart", center=(WIDTH // 2, HEIGHT // 2 + 30), 
                         color='thistle', fontsize=30)
         
 def draw_menu():
@@ -199,6 +208,12 @@ def draw_menu():
 
     screen.draw.filled_rect(start_button, GREEN)
     screen.draw.text("Start Game", center=start_button.center, color="black", fontsize=40)
+
+    screen.draw.filled_rect(endless_button, YELLOW_ACTIVE)
+    screen.draw.text(f"Arcade mode", center=endless_button.center, color="black", fontsize=30)
+
+    screen.draw.filled_rect(missions_button, YELLOW_INACTIVE)
+    screen.draw.text(f"Mission mode", center=missions_button.center, color="black", fontsize=30)
 
     screen.draw.filled_rect(sound_button, GRAY)
     screen.draw.text(f"Sound: {'On' if audio_manager.sound_enabled else 'Off'}", center=sound_button.center, color="black", fontsize=30)
