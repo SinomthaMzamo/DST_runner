@@ -1,5 +1,7 @@
 import os
 
+from mission_classes import Mission
+
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 import pgzrun
@@ -51,6 +53,18 @@ game_state = "menu"
 audio_manager = AudioManager(sounds, music)
 game = Game(Player(player_configuration), audio_manager)
 
+mission_buttons = []
+button_width = 200
+button_height = 50
+spacing = 70
+start_y = 150
+num_missions = 5
+
+for i in range(1, num_missions + 1):
+    y = start_y + (i - 1) * spacing
+    rect = Rect((WIDTH // 2 - button_width // 2, y), (button_width, button_height))
+    mission_buttons.append((rect, i))
+
 audio_manager.play_music('bg_music_welcome', 0.2)
 
 def on_mouse_down(pos):
@@ -59,12 +73,38 @@ def on_mouse_down(pos):
     if game_state == "menu":
         if start_button.collidepoint(pos):
             game_state = "playing"
+            if game.mode == "arcade":
+                game_state = "playing"
+            else:
+                game_state = "missions"
+        elif missions_button.collidepoint(pos):
+            game.mode = "missions"
+            print(game.mode)
+        elif endless_button.collidepoint(pos):
+            game.mode = "arcade"
+            print(game.mode)
         elif sound_button.collidepoint(pos):
             audio_manager.toggle_sound()
         elif music_button.collidepoint(pos):
             audio_manager.toggle_music()
         elif exit_button.collidepoint(pos):
             exit()
+    
+    elif game_state == "missions":
+        for rect, level in mission_buttons:
+            if rect.collidepoint(pos):
+                # Start selected mission
+                selected_mission = Mission(level)
+                selected_mission.build()
+                game.set_current_mission(selected_mission)
+                game_state = "playing"
+                game.start_game()
+                print(f"Starting Mission {level}", selected_mission.min_score)
+                break
+
+        # Back to main menu
+        if menu_button.collidepoint(pos):
+            game_state = "menu"
 
     elif game_state == "playing":
         if menu_button.collidepoint(pos):
@@ -113,11 +153,17 @@ def update():
     global score_counter 
 
     game.player.update_animation()
+    game.do_mission_success()
     if not game.game_started:
         return
     if game_state != 'playing':
         return
     if game.game_over:
+        game.do_game_over()
+        game.player.idle()
+        return
+    if game.mission_success:
+        game.do_game_over()
         game.player.idle()
         return
     
@@ -159,7 +205,12 @@ def draw():
     if game_state == 'menu':
         draw_menu()
         return
+    elif game_state == "missions":
+        draw_missions_screen()
+    elif game_state == "playing":
+        draw_game()
 
+def draw_game():
     draw_gradient(SKY_COLOUR)
     screen.draw.filled_rect(Rect(0, GameSettings.GROUND_Y + 40, WIDTH, HEIGHT - GameSettings.GROUND_Y - 40), GROUND_TOP)
     screen.draw.filled_rect(Rect(0, GameSettings.GROUND_Y + 80, WIDTH, HEIGHT), GROUND_BOTTOM)
@@ -179,24 +230,44 @@ def draw():
             obs.coin.draw()
         obs.actor.draw()
 
-    screen.draw.text(f"Score: {int(game.round_score)}", (10, 10), color='whitesmoke', fontsize=30)
-    screen.draw.text(f"High Score: {int(game.highscore)}", (10, 30), color='whitesmoke', fontsize=30)
+    in_mission = game.current_mission
+
+    screen.draw.text(f"Score: {int(game.round_score)}" , (10, 10), color='whitesmoke', fontsize=30)
+    screen.draw.text(
+    f"High Score: {int(game.highscore)}" if not in_mission else f"Target Score: {int(game.current_mission.min_score)}",
+    (10, 30),
+    color='whitesmoke',
+    fontsize=30
+    )
+
     screen.draw.text(f"Round Balance: {int(game.round_collected_vault_balance)}", (WIDTH // 2, 10), color='whitesmoke', fontsize=30)
-    screen.draw.text(f"Vault Balance: {int(game.total_collected_vault_balance)}", (WIDTH // 2, 30), color='whitesmoke', fontsize=30)
+    screen.draw.text(
+    f"Vault Balance: {int(game.total_collected_vault_balance)}" if not in_mission else f"Target Balance: {int(game.current_mission.vault_balance_required)}",
+    (WIDTH // 2, 30),
+    color='whitesmoke',
+    fontsize=30
+    )
     screen.draw.text("UP: Jump  DOWN: Slide", (10, 50), color='whitesmoke', fontsize=20)
     screen.draw.filled_rect(menu_button, BLUE)
     screen.draw.text("Menu", center=menu_button.center, color="white", fontsize=30)
 
 
-    if game.game_over:
-        screen.draw.text("GAME OVER", center=(WIDTH // 2, HEIGHT // 2 - 30), 
-                        color='firebrick', fontsize=60)
-        game.do_game_over()
+    if game.current_mission and game.mission_success:
+        print("yho")
+        screen.draw.text("MISSION COMPLETE", center=(WIDTH // 2, HEIGHT // 2 - 30), 
+                        color='green', fontsize=60)
         if game.has_achieved_new_high_score:
             screen.draw.text(f"New High Score: {game.highscore}", center=(WIDTH // 2, HEIGHT // 2 - 80), color='orange', fontsize=70)
             screen.draw.text("Press SPACE to restart", center=(WIDTH // 2, HEIGHT // 2 + 30), 
                         color='thistle', fontsize=30)
-            print(game.highscore, "HIGH SCORE!")
+
+    elif game.game_over:
+        screen.draw.text("GAME OVER", center=(WIDTH // 2, HEIGHT // 2 - 30), 
+                        color='firebrick', fontsize=60)
+        if game.has_achieved_new_high_score:
+            screen.draw.text(f"New High Score: {game.highscore}", center=(WIDTH // 2, HEIGHT // 2 - 80), color='orange', fontsize=70)
+            screen.draw.text("Press SPACE to restart", center=(WIDTH // 2, HEIGHT // 2 + 30), 
+                        color='thistle', fontsize=30)
         else:
             screen.draw.text("Press SPACE to restart", center=(WIDTH // 2, HEIGHT // 2 + 30), 
                         color='thistle', fontsize=30)
@@ -209,10 +280,10 @@ def draw_menu():
     screen.draw.filled_rect(start_button, GREEN)
     screen.draw.text("Start Game", center=start_button.center, color="black", fontsize=40)
 
-    screen.draw.filled_rect(endless_button, YELLOW_ACTIVE)
+    screen.draw.filled_rect(endless_button, YELLOW_ACTIVE if game.mode == 'arcade' else YELLOW_INACTIVE)
     screen.draw.text(f"Arcade mode", center=endless_button.center, color="black", fontsize=30)
 
-    screen.draw.filled_rect(missions_button, YELLOW_INACTIVE)
+    screen.draw.filled_rect(missions_button, YELLOW_ACTIVE if game.mode == 'missions' else YELLOW_INACTIVE)
     screen.draw.text(f"Mission mode", center=missions_button.center, color="black", fontsize=30)
 
     screen.draw.filled_rect(sound_button, GRAY)
@@ -223,5 +294,18 @@ def draw_menu():
 
     screen.draw.filled_rect(exit_button, RED)
     screen.draw.text("Exit", center=exit_button.center, color="white", fontsize=40)
+
+def draw_missions_screen():
+    draw_gradient(MENU_BG_COLOUR)
+    screen.draw.text("MISSIONS", center=(WIDTH // 2, 50), color="white", fontsize=70)
+    
+    for rect, level in mission_buttons:
+        screen.draw.filled_rect(rect, BLUE)
+        screen.draw.text(f"Mission {level}", center=rect.center, color="white", fontsize=30)
+    
+    # Back button
+    screen.draw.filled_rect(menu_button, RED)
+    screen.draw.text("Back", center=menu_button.center, color="white", fontsize=30)
+
 
 pgzrun.go()

@@ -6,6 +6,7 @@ class Mission:
         self.vault_balance_required = 0
         self.min_score = 0
         self.reward_multiplier = 0.0
+        self.complete = False
 
     def set_reward_multiplier(self):
         self.reward_multiplier = 0.5*self.level
@@ -17,9 +18,15 @@ class Mission:
         return get_score_requirement(self.level)
     
     def build(self):
-        self.vault_balance_required = self.get_required_vault_balance()
-        self.min_score = self.get_required_score()
+        # self.vault_balance_required = self.get_required_vault_balance()
+        # self.min_score = self.get_required_score()
         self.set_reward_multiplier()
+        self.vault_balance_required = 4
+        self.min_score = 20
+
+    def check_completion(self, score, balance):
+        return self.min_score <= score and self.vault_balance_required <= balance
+        return self.get_required_score() <= score and self.get_required_vault_balance() <= balance
     
 
     

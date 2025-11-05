@@ -1,4 +1,5 @@
 import random
+from mission_classes import Mission
 from entities.enemies import Enemy
 from entities.player import Player
 from pygame import Rect
@@ -11,9 +12,12 @@ class Game:
         self.obstacle_spawn_timer = 0
         self.obstacle_spawn_interval = 90
         self.game_over = False
+        self.mission_success = False
         self.game_speed = 5
         self.player_gravity = 0.8
         self.player = player
+        self.mode = "arcade"
+        self.current_mission = None
 
         self.round_score = 0
         self.highscore = 0
@@ -25,14 +29,21 @@ class Game:
         self.game_over_processed = False
         self.audio_manager = audio_manager
 
+    def set_current_mission(self, mission:Mission):
+        self.current_mission = mission
+
     def do_game_over(self):
-        if not self.game_over_processed:
+        if not self.game_over_processed and self.new_highscore():
             self.total_collected_vault_balance += self.round_collected_vault_balance
             if self.new_highscore():
                 self.update_highscore()
                 self.has_achieved_new_high_score = True
-
         self.game_over_processed = True
+
+    def do_mission_success(self):
+        if self.current_mission and self.current_mission.check_completion(self.round_score, self.round_collected_vault_balance):
+            self.mission_success = True
+            self.current_mission.complete = True
         
     def update_highscore(self):
         self.highscore = self.round_score
