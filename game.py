@@ -44,6 +44,9 @@ class Game:
         if self.current_mission and self.current_mission.check_completion(self.round_score, self.round_collected_vault_balance):
             self.mission_success = True
             self.current_mission.complete = True
+            self.current_mission.is_available = False
+            return True
+        return False
         
     def update_highscore(self):
         self.highscore = self.round_score

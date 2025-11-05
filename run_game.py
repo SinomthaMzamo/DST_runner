@@ -1,6 +1,6 @@
 import os
 
-from mission_classes import Mission
+from mission_classes import Mission, MissionManager
 
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
@@ -52,18 +52,8 @@ game_state = "menu"
 
 audio_manager = AudioManager(sounds, music)
 game = Game(Player(player_configuration), audio_manager)
-
-mission_buttons = []
-button_width = 200
-button_height = 50
-spacing = 70
-start_y = 150
 num_missions = 5
-
-for i in range(1, num_missions + 1):
-    y = start_y + (i - 1) * spacing
-    rect = Rect((WIDTH // 2 - button_width // 2, y), (button_width, button_height))
-    mission_buttons.append((rect, i))
+mission_manager = MissionManager(5)
 
 audio_manager.play_music('bg_music_welcome', 0.2)
 
@@ -91,16 +81,16 @@ def on_mouse_down(pos):
             exit()
     
     elif game_state == "missions":
-        for rect, level in mission_buttons:
-            if rect.collidepoint(pos):
-                # Start selected mission
-                selected_mission = Mission(level)
-                selected_mission.build()
-                game.set_current_mission(selected_mission)
-                game_state = "playing"
-                game.start_game()
-                print(f"Starting Mission {level}", selected_mission.min_score)
-                break
+        print(mission_manager.mission_and_button_list)
+        for mission, button in mission_manager.mission_and_button_list:
+            print("Checking", button[1], "button area:", button[0], "Miss is active:", mission.is_available)
+            if button[0].collidepoint(pos):
+                if mission.is_available:
+                    mission_manager.assign_mission_to_game(game, mission)
+                    game_state = "playing"
+                    game.start_game()
+                    break
+                print("Mission", mission.level, "state", mission.is_available)
 
         # Back to main menu
         if menu_button.collidepoint(pos):
@@ -153,7 +143,7 @@ def update():
     global score_counter 
 
     game.player.update_animation()
-    game.do_mission_success()
+    mission_manager.complete_mission(game)
     if not game.game_started:
         return
     if game_state != 'playing':
@@ -299,9 +289,17 @@ def draw_missions_screen():
     draw_gradient(MENU_BG_COLOUR)
     screen.draw.text("MISSIONS", center=(WIDTH // 2, 50), color="white", fontsize=70)
     
-    for rect, level in mission_buttons:
-        screen.draw.filled_rect(rect, BLUE)
+    # for rect, level in mission_manager.buttons:
+    #     screen.draw.filled_rect(rect, BLUE)
+    #     screen.draw.text(f"Mission {level}", center=rect.center, color="white", fontsize=30)
+    for mission, button in mission_manager.mission_and_button_list:
+        rect, level = button
+        screen.draw.filled_rect(rect, BLUE if mission.is_available else GRAY)
         screen.draw.text(f"Mission {level}", center=rect.center, color="white", fontsize=30)
+        if mission.complete:
+            #draw a green rect in button top left corner
+            completion_rect = Rect(rect.left + 5, rect.top + 5, 20, 20)  # small 20x20 rectangle
+            screen.draw.filled_rect(completion_rect, GREEN)  # green
     
     # Back button
     screen.draw.filled_rect(menu_button, RED)
