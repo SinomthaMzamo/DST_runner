@@ -27,11 +27,12 @@ class Mission:
         return get_score_requirement(self.level)
     
     def build(self):
-        # self.vault_balance_required = self.get_required_vault_balance()
-        # self.min_score = self.get_required_score()
+        self.vault_balance_required = self.get_required_vault_balance()
+        self.min_score = self.get_required_score()
         self.set_reward_multiplier()
-        self.vault_balance_required = 0
-        self.min_score = 12
+        # comment this in for easy testing
+        # self.vault_balance_required = 0
+        # self.min_score = 12
 
 
     def check_completion(self, score, balance):

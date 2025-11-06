@@ -35,7 +35,7 @@ class Game:
         self.current_mission = mission
 
     def do_game_over(self):
-        if not self.game_over_processed and self.new_highscore():
+        if not self.game_over_processed:
             self.total_collected_vault_balance += self.round_collected_vault_balance
             if self.new_highscore():
                 self.update_highscore()
@@ -97,6 +97,7 @@ class Game:
         self.game_over_processed = False
         self.mission_success = False
         self.mission_success_handled = False
+        self.current_mission = None
 
     def update_obstacles(self):
         thresholds = {

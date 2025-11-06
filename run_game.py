@@ -115,7 +115,7 @@ def on_mouse_down(pos):
 
 def on_key_down(key):
     global game_state
-    if not game.game_started:
+    if not game.game_started and not game_state == "missions":
         if key == keys.SPACE:
             game.start_game()
             audio_manager.play_music('bg_music_playing', 0.1)
