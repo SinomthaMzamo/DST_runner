@@ -7,7 +7,7 @@ class Mission:
         self.level = level
         self.vault_balance_required = 0
         self.min_score = 0
-        self.reward_multiplier = 0.0
+        self.reward_multiplier = 0
         self.complete = False
         self.is_available = False
         self.button = None
@@ -18,7 +18,7 @@ class Mission:
             self.is_available = True
 
     def set_reward_multiplier(self):
-        self.reward_multiplier = 0.5*self.level
+        self.reward_multiplier = self.level + 1
     
     def get_required_vault_balance(self):
         return get_vault_balance_requirement(self.level)
@@ -27,11 +27,10 @@ class Mission:
         return get_score_requirement(self.level)
     
     def build(self):
-        # self.vault_balance_required = self.get_required_vault_balance()
-        # self.min_score = self.get_required_score()
+        self.vault_balance_required = self.get_required_vault_balance()
+        self.min_score = self.get_required_score()
         self.set_reward_multiplier()
-        self.vault_balance_required = 4
-        self.min_score = 20
+
 
     def check_completion(self, score, balance):
         return self.min_score <= score and self.vault_balance_required <= balance
@@ -82,7 +81,9 @@ class MissionManager:
             print("availability:", game.current_mission.is_available, "completeness:", game.current_mission.complete)
             idx = self.missions.index(game.current_mission)
             if idx + 1 < len(self.missions):
-                self.missions[idx + 1].activate_mission()
+                active_mission = self.missions[idx + 1]
+                active_mission.activate_mission()
+                # game.mission_success = False
             return True
         return False
         

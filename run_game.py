@@ -123,6 +123,19 @@ def on_key_down(key):
 
     elif game_state == 'menu' and key == keys.RETURN:
         game_state = 'playing'
+    elif game.current_mission and game.mission_success:
+            if key == keys.SPACE:
+                print("should be returning to missions")
+                # Reset mission/game state
+                game.reset()
+                # game.mission_success = False
+                game.current_mission = None
+                # Return to mission selection
+                game_state = "missions"
+                # Resume welcome music
+                audio_manager.music.stop()
+                audio_manager.play_music('bg_music_welcome', 0.1)
+            return
 
 def set_difficulty(game: Game, interval, speed_increase_factor):
      if game.round_score % interval == 0:
@@ -130,12 +143,12 @@ def set_difficulty(game: Game, interval, speed_increase_factor):
 
 def record_score():
     global score_counter
-
+    # The higher the multiplier, the faster the score updates
     score_counter += 1
-    score_delay = 10  
-
-    # Update the score only every `score_delay` frames
-    if score_counter >= score_delay:
+    base_delay = 10  
+    effective_delay = max(1, int(base_delay / game.score_multiplier)) 
+    
+    if score_counter >= effective_delay:
         game.round_score += 1
         score_counter = 0  # reset counter
 
@@ -238,6 +251,7 @@ def draw_game():
     fontsize=30
     )
     screen.draw.text("UP: Jump  DOWN: Slide", (10, 50), color='whitesmoke', fontsize=20)
+    screen.draw.text(f"MULTIPLIER: {game.score_multiplier}x", (10, 70), color='gold', fontsize=20)
     screen.draw.filled_rect(menu_button, BLUE)
     screen.draw.text("Menu", center=menu_button.center, color="white", fontsize=30)
 
@@ -246,9 +260,11 @@ def draw_game():
         print("yho")
         screen.draw.text("MISSION COMPLETE", center=(WIDTH // 2, HEIGHT // 2 - 30), 
                         color='green', fontsize=60)
+        screen.draw.text(F"NEW SCORE MULTIPLIER ACHIEVED: {game.current_mission.reward_multiplier}.0x", center=(WIDTH // 2, HEIGHT // 2 + 60), 
+                        color='yellow', fontsize=30)
         if game.has_achieved_new_high_score:
             screen.draw.text(f"New High Score: {game.highscore}", center=(WIDTH // 2, HEIGHT // 2 - 80), color='orange', fontsize=70)
-            screen.draw.text("Press SPACE to restart", center=(WIDTH // 2, HEIGHT // 2 + 30), 
+            screen.draw.text("Press SPACE to return to missions", center=(WIDTH // 2, HEIGHT // 2 + 90), 
                         color='thistle', fontsize=30)
 
     elif game.game_over:
@@ -289,9 +305,6 @@ def draw_missions_screen():
     draw_gradient(MENU_BG_COLOUR)
     screen.draw.text("MISSIONS", center=(WIDTH // 2, 50), color="white", fontsize=70)
     
-    # for rect, level in mission_manager.buttons:
-    #     screen.draw.filled_rect(rect, BLUE)
-    #     screen.draw.text(f"Mission {level}", center=rect.center, color="white", fontsize=30)
     for mission, button in mission_manager.mission_and_button_list:
         rect, level = button
         screen.draw.filled_rect(rect, BLUE if mission.is_available else GRAY)

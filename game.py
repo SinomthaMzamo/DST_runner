@@ -18,6 +18,7 @@ class Game:
         self.player = player
         self.mode = "arcade"
         self.current_mission = None
+        self.score_multiplier = 1
 
         self.round_score = 0
         self.highscore = 0
@@ -45,6 +46,7 @@ class Game:
             self.mission_success = True
             self.current_mission.complete = True
             self.current_mission.is_available = False
+            self.score_multiplier = self.current_mission.reward_multiplier
             return True
         return False
         
@@ -92,6 +94,7 @@ class Game:
         self.game_started = False
         self.has_achieved_new_high_score = False
         self.game_over_processed = False
+        self.mission_success = False
 
     def update_obstacles(self):
         thresholds = {
