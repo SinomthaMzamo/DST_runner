@@ -35,3 +35,5 @@ exit_button = buttons["exit_button"]
 
 # === IN-GAME MENU BUTTON ===
 menu_button = Rect(WIDTH - 120, 10, 100, 40)
+
+pause_button = Rect(10, HEIGHT - 50, 120, 40) 

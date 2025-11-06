@@ -28,6 +28,7 @@ class Game:
 
         self.game_started = False
         self.game_over_processed = False
+        self.mission_success_handled = False
         self.audio_manager = audio_manager
 
     def set_current_mission(self, mission:Mission):
@@ -95,6 +96,7 @@ class Game:
         self.has_achieved_new_high_score = False
         self.game_over_processed = False
         self.mission_success = False
+        self.mission_success_handled = False
 
     def update_obstacles(self):
         thresholds = {

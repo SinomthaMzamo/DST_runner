@@ -27,9 +27,11 @@ class Mission:
         return get_score_requirement(self.level)
     
     def build(self):
-        self.vault_balance_required = self.get_required_vault_balance()
-        self.min_score = self.get_required_score()
+        # self.vault_balance_required = self.get_required_vault_balance()
+        # self.min_score = self.get_required_score()
         self.set_reward_multiplier()
+        self.vault_balance_required = 0
+        self.min_score = 12
 
 
     def check_completion(self, score, balance):
@@ -73,17 +75,16 @@ class MissionManager:
 
     def assign_mission_to_game(self, game, selected_mission):
         game.set_current_mission(selected_mission)
-        print(f"Starting Mission {selected_mission.level}", selected_mission.min_score)
 
     def complete_mission(self, game):
         """Mark mission as complete and unlock the next one."""
-        if game.do_mission_success():
-            print("availability:", game.current_mission.is_available, "completeness:", game.current_mission.complete)
+        if game.do_mission_success() and not game.mission_success_handled:
+            game.audio_manager.play_sound("win")
+            game.mission_success_handled = True
             idx = self.missions.index(game.current_mission)
             if idx + 1 < len(self.missions):
                 active_mission = self.missions[idx + 1]
                 active_mission.activate_mission()
-                # game.mission_success = False
             return True
         return False
         

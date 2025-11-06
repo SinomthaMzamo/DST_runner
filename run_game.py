@@ -8,7 +8,7 @@ import pgzrun
 
 from entities.player import Player
 from game import Game
-from ui.buttons import (start_button, sound_button, music_button, exit_button, menu_button, missions_button, endless_button)
+from ui.buttons import (start_button, sound_button, music_button, exit_button, menu_button, missions_button, endless_button, pause_button)
 from ui.colours import *
 from constants import player_configuration, HEIGHT, WIDTH, GameSettings
 
@@ -28,7 +28,13 @@ class AudioManager:
                         s.stop()
                     except AttributeError:
                         pass
-            getattr(self.sounds, sound_name).play()
+            try:
+                sound = getattr(self.sounds, sound_name)  # get the actual Sound object
+                sound.set_volume(0.2)
+                sound.play()
+            except AttributeError:
+                print(f"Sound '{sound_name}' not found.")
+                return
 
     
     def play_music(self, track_name, volume=0.2):
@@ -49,6 +55,7 @@ class AudioManager:
 
 score_counter = 0
 game_state = "menu" 
+paused = False
 
 audio_manager = AudioManager(sounds, music)
 game = Game(Player(player_configuration), audio_manager)
@@ -58,7 +65,7 @@ mission_manager = MissionManager(5)
 audio_manager.play_music('bg_music_welcome', 0.2)
 
 def on_mouse_down(pos):
-    global game_state
+    global game_state, paused
 
     if game_state == "menu":
         if start_button.collidepoint(pos):
@@ -67,12 +74,11 @@ def on_mouse_down(pos):
                 game_state = "playing"
             else:
                 game_state = "missions"
+                audio_manager.play_music("bg_music_missions", 0.1)
         elif missions_button.collidepoint(pos):
             game.mode = "missions"
-            print(game.mode)
         elif endless_button.collidepoint(pos):
             game.mode = "arcade"
-            print(game.mode)
         elif sound_button.collidepoint(pos):
             audio_manager.toggle_sound()
         elif music_button.collidepoint(pos):
@@ -81,16 +87,14 @@ def on_mouse_down(pos):
             exit()
     
     elif game_state == "missions":
-        print(mission_manager.mission_and_button_list)
         for mission, button in mission_manager.mission_and_button_list:
-            print("Checking", button[1], "button area:", button[0], "Miss is active:", mission.is_available)
             if button[0].collidepoint(pos):
                 if mission.is_available:
                     mission_manager.assign_mission_to_game(game, mission)
                     game_state = "playing"
                     game.start_game()
+                    audio_manager.play_music("bg_music_playing", 0.1)
                     break
-                print("Mission", mission.level, "state", mission.is_available)
 
         # Back to main menu
         if menu_button.collidepoint(pos):
@@ -102,6 +106,12 @@ def on_mouse_down(pos):
             audio_manager.music.stop()
             audio_manager.play_music('bg_music_welcome', 0.1)
             game_state = "menu"
+        elif pause_button.collidepoint(pos) and game.game_started:
+            paused = not paused
+            if paused:
+                audio_manager.music.set_volume(0.05)  # optional: lower volume when paused
+            else:
+                audio_manager.music.set_volume(0.2)  # restore volume
 
 def on_key_down(key):
     global game_state
@@ -125,7 +135,6 @@ def on_key_down(key):
         game_state = 'playing'
     elif game.current_mission and game.mission_success:
             if key == keys.SPACE:
-                print("should be returning to missions")
                 # Reset mission/game state
                 game.reset()
                 # game.mission_success = False
@@ -134,7 +143,7 @@ def on_key_down(key):
                 game_state = "missions"
                 # Resume welcome music
                 audio_manager.music.stop()
-                audio_manager.play_music('bg_music_welcome', 0.1)
+                audio_manager.play_music('bg_music_missions', 0.1)
             return
 
 def set_difficulty(game: Game, interval, speed_increase_factor):
@@ -146,7 +155,7 @@ def record_score():
     # The higher the multiplier, the faster the score updates
     score_counter += 1
     base_delay = 10  
-    effective_delay = max(1, int(base_delay / game.score_multiplier)) 
+    effective_delay = max(1, int(base_delay / game.score_multiplier)) + 3
     
     if score_counter >= effective_delay:
         game.round_score += 1
@@ -159,7 +168,7 @@ def update():
     mission_manager.complete_mission(game)
     if not game.game_started:
         return
-    if game_state != 'playing':
+    if game_state != 'playing' or paused:
         return
     if game.game_over:
         game.do_game_over()
@@ -251,21 +260,21 @@ def draw_game():
     fontsize=30
     )
     screen.draw.text("UP: Jump  DOWN: Slide", (10, 50), color='whitesmoke', fontsize=20)
-    screen.draw.text(f"MULTIPLIER: {game.score_multiplier}x", (10, 70), color='gold', fontsize=20)
+    screen.draw.text(f"MULTIPLIER: {game.score_multiplier}.0x", (10, 70), color='gold', fontsize=20)
     screen.draw.filled_rect(menu_button, BLUE)
     screen.draw.text("Menu", center=menu_button.center, color="white", fontsize=30)
 
 
     if game.current_mission and game.mission_success:
-        print("yho")
         screen.draw.text("MISSION COMPLETE", center=(WIDTH // 2, HEIGHT // 2 - 30), 
                         color='green', fontsize=60)
-        screen.draw.text(F"NEW SCORE MULTIPLIER ACHIEVED: {game.current_mission.reward_multiplier}.0x", center=(WIDTH // 2, HEIGHT // 2 + 60), 
+        screen.draw.text(F"NEW SCORE MULTIPLIER ACHIEVED: {game.current_mission.reward_multiplier}.0x", center=(WIDTH // 2, HEIGHT // 2), 
                         color='yellow', fontsize=30)
+        screen.draw.text("Press SPACE to return to missions", center=(WIDTH // 2, HEIGHT // 2 + 60), 
+                        color='thistle', fontsize=30)
         if game.has_achieved_new_high_score:
             screen.draw.text(f"New High Score: {game.highscore}", center=(WIDTH // 2, HEIGHT // 2 - 80), color='orange', fontsize=70)
-            screen.draw.text("Press SPACE to return to missions", center=(WIDTH // 2, HEIGHT // 2 + 90), 
-                        color='thistle', fontsize=30)
+            
 
     elif game.game_over:
         screen.draw.text("GAME OVER", center=(WIDTH // 2, HEIGHT // 2 - 30), 
@@ -277,6 +286,13 @@ def draw_game():
         else:
             screen.draw.text("Press SPACE to restart", center=(WIDTH // 2, HEIGHT // 2 + 30), 
                         color='thistle', fontsize=30)
+            
+    screen.draw.filled_rect(pause_button, BLUE)
+    screen.draw.text("Pause" if not paused else "Play", center=pause_button.center, color="white", fontsize=25)
+
+    if paused:
+        screen.draw.text("PAUSED", center=(WIDTH // 2, HEIGHT // 2), color='yellow', fontsize=70)
+
         
 def draw_menu():
     draw_gradient(MENU_BG_COLOUR)
@@ -307,13 +323,16 @@ def draw_missions_screen():
     
     for mission, button in mission_manager.mission_and_button_list:
         rect, level = button
-        screen.draw.filled_rect(rect, BLUE if mission.is_available else GRAY)
+        screen.draw.filled_rect(rect, BLUE if mission.is_available else DARK_GRAY)
         screen.draw.text(f"Mission {level}", center=rect.center, color="white", fontsize=30)
-        if mission.complete:
-            #draw a green rect in button top left corner
-            completion_rect = Rect(rect.left + 5, rect.top + 5, 20, 20)  # small 20x20 rectangle
-            screen.draw.filled_rect(completion_rect, GREEN)  # green
-    
+        screen.draw.text(
+            "COMPLETED" if mission.complete else "LOCKED" if not mission.is_available else "",
+            (rect.left + 5, rect.top),
+            color="lightgreen" if mission.complete else "lightgray",
+            fontsize=20
+        )
+            
+
     # Back button
     screen.draw.filled_rect(menu_button, RED)
     screen.draw.text("Back", center=menu_button.center, color="white", fontsize=30)
