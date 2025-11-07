@@ -37,7 +37,6 @@ class Mission:
 
     def check_completion(self, score, balance):
         return self.min_score <= score and self.vault_balance_required <= balance
-        return self.get_required_score() <= score and self.get_required_vault_balance() <= balance
     
 
 class MissionManager:

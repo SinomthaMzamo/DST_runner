@@ -124,7 +124,16 @@ def on_key_down(key):
     if game_state == 'playing':
         if game.game_over:
             if key == keys.SPACE:
-                game.reset()
+                if game.current_mission:
+                    selected_mission = game.current_mission
+                    game.reset()
+                    game.current_mission = selected_mission
+                    game.mode = 'missions'
+                    game.start_game()
+                    audio_manager.music.stop()
+                    audio_manager.play_music("bg_music_missions", 0.1)
+                else:
+                    game.reset()
             return
     
     if key == keys.UP and not game.player.is_jumping and not game.player.is_sliding:
@@ -230,7 +239,7 @@ def draw_game():
     game.player.actor.draw()
 
     if not game.game_started:
-        screen.draw.text("Press SPACE to start", center=(WIDTH // 2, HEIGHT // 2), color="white", fontsize=40)
+        screen.draw.text("Press SPACE to start", center=(WIDTH // 2, HEIGHT // 2), color="white", fontsize=40, owidth=1, ocolor="black")
         # Draw Menu Button
         screen.draw.filled_rect(menu_button, BLUE)
         screen.draw.text("Menu", center=menu_button.center, color="white", fontsize=30)
@@ -252,46 +261,47 @@ def draw_game():
     fontsize=30
     )
 
-    screen.draw.text(f"Round Balance: {int(game.round_collected_vault_balance)}", (WIDTH // 2, 10), color='whitesmoke', fontsize=30)
+    screen.draw.text(f"Round Balance: {int(game.round_collected_vault_balance)}", (WIDTH - 240, 10), color='whitesmoke', fontsize=30)
     screen.draw.text(
     f"Vault Balance: {int(game.total_collected_vault_balance)}" if not in_mission else f"Target Balance: {int(game.current_mission.vault_balance_required)}",
-    (WIDTH // 2, 30),
+    (WIDTH - 240, 30),
     color='whitesmoke',
     fontsize=30
     )
-    screen.draw.text("UP: Jump  DOWN: Slide", (10, 50), color='whitesmoke', fontsize=20)
-    screen.draw.text(f"MULTIPLIER: {game.score_multiplier}.0x", (10, 70), color='gold', fontsize=20)
+    screen.draw.text("Instructions:", (WIDTH//2 - 160, HEIGHT - 120), color='whitesmoke', fontsize=30, owidth=1, ocolor="black")
+    screen.draw.text("UP: Jump  DOWN: Slide", (WIDTH//2 - 160, HEIGHT - 100), color='whitesmoke', fontsize=40, owidth=1, ocolor="black")
+    screen.draw.text(f"MULTIPLIER: {game.score_multiplier}.0x", (10, 60), color='gold', fontsize=20)
     screen.draw.filled_rect(menu_button, BLUE)
     screen.draw.text("Menu", center=menu_button.center, color="white", fontsize=30)
 
 
     if game.current_mission and game.mission_success:
         screen.draw.text("MISSION COMPLETE", center=(WIDTH // 2, HEIGHT // 2 - 30), 
-                        color='green', fontsize=60)
+                        color='green', fontsize=60, owidth=1, ocolor="black")
         screen.draw.text(F"NEW SCORE MULTIPLIER ACHIEVED: {game.current_mission.reward_multiplier}.0x", center=(WIDTH // 2, HEIGHT // 2), 
-                        color='yellow', fontsize=30)
+                        color='gold', fontsize=30, owidth=1, ocolor="black")
         screen.draw.text("Press SPACE to return to missions", center=(WIDTH // 2, HEIGHT // 2 + 60), 
-                        color='thistle', fontsize=30)
+                        color='thistle', fontsize=30, owidth=1, ocolor="black")
         if game.has_achieved_new_high_score:
-            screen.draw.text(f"New High Score: {game.highscore}", center=(WIDTH // 2, HEIGHT // 2 - 80), color='orange', fontsize=70)
+            screen.draw.text(f"New High Score: {game.highscore}", center=(WIDTH // 2, HEIGHT // 2 - 80), color='orange', fontsize=70, owidth=1, ocolor="black")
             
 
     elif game.game_over:
         screen.draw.text("GAME OVER", center=(WIDTH // 2, HEIGHT // 2 - 30), 
-                        color='firebrick', fontsize=60)
+                        color='firebrick', fontsize=60, owidth=1, ocolor="black")
         if game.has_achieved_new_high_score:
-            screen.draw.text(f"New High Score: {game.highscore}", center=(WIDTH // 2, HEIGHT // 2 - 80), color='orange', fontsize=70)
+            screen.draw.text(f"New High Score: {game.highscore}", center=(WIDTH // 2, HEIGHT // 2 - 80), color='orange', fontsize=70, owidth=1, ocolor="black")
             screen.draw.text("Press SPACE to restart", center=(WIDTH // 2, HEIGHT // 2 + 30), 
-                        color='thistle', fontsize=30)
+                        color='thistle', fontsize=30, owidth=1, ocolor="black")
         else:
             screen.draw.text("Press SPACE to restart", center=(WIDTH // 2, HEIGHT // 2 + 30), 
-                        color='thistle', fontsize=30)
+                        color='thistle', fontsize=30, owidth=1, ocolor="black")
             
     screen.draw.filled_rect(pause_button, BLUE)
-    screen.draw.text("Pause" if not paused else "Play", center=pause_button.center, color="white", fontsize=25)
+    screen.draw.text("Pause" if not paused else "Play", center=pause_button.center, color="white", fontsize=30)
 
     if paused:
-        screen.draw.text("PAUSED", center=(WIDTH // 2, HEIGHT // 2), color='yellow', fontsize=70)
+        screen.draw.text("PAUSED", center=(WIDTH // 2, HEIGHT // 2), color='yellow', fontsize=70, owidth=1, ocolor="black")
 
         
 def draw_menu():

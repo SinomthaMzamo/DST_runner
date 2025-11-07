@@ -137,7 +137,12 @@ class Game:
             # ✅ Collision check with threshold
             if player_rect.colliderect(obs_rect):
                 if obs.obstacle_type == 'platform':
-                    self.player.land(Player.CLOUD_Y_POSITION)
+                    if self.player.y < obs.y and self.player.vertical_velocity > 0:
+                        self.player.land(Player.CLOUD_Y_POSITION)
+                    elif self.player.y > obs.y and self.player.vertical_velocity < 0:
+                        self.player.vertical_velocity = 0  # Stop upward movement
+                        self.player.vertical_velocity = 2  # Push them down
+                        self.audio_manager.play_sound('bump', override=True)
                 else:
                     self.game_over = True
                     self.audio_manager.play_sound('collide', override=True)

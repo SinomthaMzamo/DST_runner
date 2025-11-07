@@ -23,10 +23,10 @@ def growth_requirement(level: int, base: float, rate: float = 1.18, log_weight: 
     return int(round(raw_value / 10) * 10)
 
 def get_score_requirement(level):
-    return growth_requirement(level, base=120, rate=2.18, log_weight=0.5)
+    return growth_requirement(level, base=20, rate=2.18, log_weight=0.5)
 
 def get_vault_balance_requirement(level):
-    return growth_requirement(level, base=50, rate=1.38, log_weight=0.3)
+    return growth_requirement(level, base=12, rate=1.38, log_weight=0.3)
 
 # for i in range(10):
 #     print(get_score_requirement(i))
