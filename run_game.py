@@ -83,6 +83,7 @@ def on_mouse_down(pos):
             audio_manager.toggle_music()
         elif exit_button.collidepoint(pos):
             exit()
+        
     
     elif game_state == "missions":
         for mission, button in mission_manager.mission_and_button_list:
@@ -97,6 +98,8 @@ def on_mouse_down(pos):
         # Back to main menu
         if menu_button.collidepoint(pos):
             game_state = "menu"
+            audio_manager.music.stop()
+            audio_manager.play_music('bg_music_welcome', 0.1)
 
     elif game_state == "playing":
         if menu_button.collidepoint(pos):
@@ -284,7 +287,6 @@ def draw_menu():
     screen.draw.filled_rect(endless_button, YELLOW_ACTIVE if game.mode == 'arcade' else YELLOW_INACTIVE)
     screen.draw.text(f"Arcade mode", center=endless_button.center, color=f"{'black' if game.mode == 'missions' else 'white'}", fontsize=30)
 
-    screen.draw.text(f"Select a game mode and press 'Start Game' to play", (50, HEIGHT - 70), color="thistle", fontsize=40)
     screen.draw.filled_rect(missions_button, YELLOW_ACTIVE if game.mode == 'missions' else YELLOW_INACTIVE)
     screen.draw.text(f"Mission mode", center=missions_button.center, color=f"{'black' if game.mode == 'arcade' else 'white'}", fontsize=30)
 
@@ -296,6 +298,9 @@ def draw_menu():
 
     screen.draw.filled_rect(exit_button, RED)
     screen.draw.text("Exit", center=exit_button.center, color="white", fontsize=40)
+
+    screen.draw.text(f"Select a game mode and press 'Start Game' to play", (50, HEIGHT - 70), color="thistle", fontsize=40)
+
 
 def draw_missions_screen():
     draw_gradient(MENU_BG_COLOUR)
