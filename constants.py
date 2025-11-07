@@ -55,7 +55,7 @@ obstacle_configurations = {
     },
     'platform': {
         'x': WIDTH,
-        'y': 260,
+        'y': GameSettings.GROUND_Y - 30,
         'width': 50,
         'height': 60,
     }
