@@ -179,7 +179,7 @@ def update():
         game.player.idle()
         return
     
-    set_difficulty(game, 500, 0.4)
+    set_difficulty(game, 500, 0.2)
     record_score()
 
     if keyboard.down and not game.player.is_jumping:
