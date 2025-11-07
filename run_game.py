@@ -115,6 +115,7 @@ def on_mouse_down(pos):
 
 def on_key_down(key):
     global game_state
+    # 
     if not game.game_started and not game_state == "missions":
         if key == keys.SPACE:
             game.start_game()
@@ -122,18 +123,13 @@ def on_key_down(key):
         return
 
     if game_state == 'playing':
-        if game.game_over:
-            if key == keys.SPACE:
-                if game.current_mission:
-                    selected_mission = game.current_mission
-                    game.reset()
-                    game.current_mission = selected_mission
-                    game.mode = 'missions'
-                    game.start_game()
-                    audio_manager.music.stop()
-                    audio_manager.play_music("bg_music_missions", 0.1)
-                else:
-                    game.reset()
+        if game.game_over and key == keys.SPACE:
+            if game.current_mission:
+                game.replay_mission()
+                audio_manager.music.stop()
+                audio_manager.play_music("bg_music_missions", 0.1)
+            else:
+                game.reset()
             return
     
     if key == keys.UP and not game.player.is_jumping and not game.player.is_sliding:
@@ -142,18 +138,13 @@ def on_key_down(key):
 
     elif game_state == 'menu' and key == keys.RETURN:
         game_state = 'playing'
-    elif game.current_mission and game.mission_success:
-            if key == keys.SPACE:
-                # Reset mission/game state
-                game.reset()
-                # game.mission_success = False
-                game.current_mission = None
-                # Return to mission selection
-                game_state = "missions"
-                # Resume welcome music
-                audio_manager.music.stop()
-                audio_manager.play_music('bg_music_missions', 0.1)
-            return
+    elif game.current_mission and game.mission_success and key == keys.SPACE:
+        game.reset()
+        game.current_mission = None
+        game_state = "missions"
+        audio_manager.music.stop()
+        audio_manager.play_music('bg_music_missions', 0.1)
+        return
 
 def set_difficulty(game: Game, interval, speed_increase_factor):
      if game.round_score % interval == 0:
@@ -168,7 +159,7 @@ def record_score():
     
     if score_counter >= effective_delay:
         game.round_score += 1
-        score_counter = 0  # reset counter
+        score_counter = 0  
 
 def update():
     global score_counter 

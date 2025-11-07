@@ -62,6 +62,13 @@ class Game:
         self.player.is_idling = False
         self.player.is_running = True
 
+    def replay_mission(self):
+        selected_mission = self.current_mission
+        self.reset()
+        self.current_mission = selected_mission
+        self.mode = 'missions'
+        self.start_game()
+
     def create_obstacle(self, obstacle_type=''):
         obstacle_type = random.choice(['ground', 'floating', 'floating-low']) if obstacle_type != 'platform' else  'platform'
         obstacle_configuration = obstacle_configurations[obstacle_type]
