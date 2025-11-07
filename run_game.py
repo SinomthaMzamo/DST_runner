@@ -1,11 +1,9 @@
 import os
-
-from mission_classes import Mission, MissionManager
+from mission_classes import MissionManager
 
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 import pgzrun
-
 from entities.player import Player
 from game import Game
 from ui.buttons import (start_button, sound_button, music_button, exit_button, menu_button, missions_button, endless_button, pause_button)
@@ -29,7 +27,7 @@ class AudioManager:
                     except AttributeError:
                         pass
             try:
-                sound = getattr(self.sounds, sound_name)  # get the actual Sound object
+                sound = getattr(self.sounds, sound_name)
                 sound.set_volume(0.2)
                 sound.play()
             except AttributeError:
@@ -50,7 +48,6 @@ class AudioManager:
         if not self.music_enabled:
             self.music.stop()
         else:
-            # Resume music based on game state
             audio_manager.play_music('bg_music_welcome', 0.1)
 
 score_counter = 0
@@ -59,8 +56,9 @@ paused = False
 
 audio_manager = AudioManager(sounds, music)
 game = Game(Player(player_configuration), audio_manager)
+
 num_missions = 5
-mission_manager = MissionManager(5)
+mission_manager = MissionManager(num_missions)
 
 audio_manager.play_music('bg_music_welcome', 0.2)
 
@@ -109,9 +107,9 @@ def on_mouse_down(pos):
         elif pause_button.collidepoint(pos) and game.game_started:
             paused = not paused
             if paused:
-                audio_manager.music.set_volume(0.05)  # optional: lower volume when paused
+                audio_manager.music.set_volume(0.05)  
             else:
-                audio_manager.music.set_volume(0.2)  # restore volume
+                audio_manager.music.set_volume(0.2)
 
 def on_key_down(key):
     global game_state
@@ -147,8 +145,6 @@ def on_key_down(key):
         return
 
 def update():
-    global score_counter 
-
     game.player.update_animation()
     mission_manager.complete_mission(game)
     if not game.game_started:
@@ -188,7 +184,6 @@ def update():
 def draw_gradient(colour):
     screen.fill(colour)
     for i in range(0, HEIGHT, 10):
-        # Slightly increase blue and decrease brightness as we go down
         shade = (
             max(0, colour[0] - i // 20),          # keep red low
             max(0, colour[1] - i // 30),          # reduce green slowly
@@ -261,7 +256,6 @@ def draw_game():
         if game.has_achieved_new_high_score:
             screen.draw.text(f"New High Score: {game.highscore}", center=(WIDTH // 2, HEIGHT // 2 - 80), color='orange', fontsize=70, owidth=1, ocolor="black")
             
-
     elif game.game_over:
         screen.draw.text("GAME OVER", center=(WIDTH // 2, HEIGHT // 2 - 30), 
                         color='firebrick', fontsize=60, owidth=1, ocolor="black")
@@ -318,8 +312,7 @@ def draw_missions_screen():
             fontsize=20
         )
             
-
-    # Back button
+    # Back to menu button
     screen.draw.filled_rect(menu_button, RED)
     screen.draw.text("Back", center=menu_button.center, color="white", fontsize=30)
 

@@ -165,7 +165,6 @@ class Game:
                     self.audio_manager.play_sound('collect')
                     self.round_collected_vault_balance += value_collected
 
-
     def dump_player(self):
         return self.player.__str__()
     
