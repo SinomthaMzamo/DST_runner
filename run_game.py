@@ -37,6 +37,7 @@ class AudioManager:
     
     def play_music(self, track_name, volume=0.2):
         if self.music_enabled:
+            self.music.stop()
             self.music.play(track_name)
             self.music.set_volume(volume)
     
