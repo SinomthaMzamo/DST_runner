@@ -20,6 +20,10 @@ class Game:
         self.current_mission = None
         self.score_multiplier = 1
 
+        self.score_counter = 0
+        self.interval = 500
+        self.speed_increase_factor = 0.2
+
         self.round_score = 0
         self.highscore = 0
         self.has_achieved_new_high_score = False
@@ -164,4 +168,18 @@ class Game:
 
     def dump_player(self):
         return self.player.__str__()
+    
+    def set_difficulty(self):
+     if self.round_score % self.interval == 0:
+            self.game_speed += self.speed_increase_factor
+
+    def record_score(self):
+        # The higher the multiplier, the faster the score updates
+        self.score_counter += 1
+        base_delay = 10  
+        effective_delay = max(1, int(base_delay / self.score_multiplier)) + 3
+        
+        if self.score_counter >= effective_delay:
+            self.round_score += 1
+            self.score_counter = 0 
     

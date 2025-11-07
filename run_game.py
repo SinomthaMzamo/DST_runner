@@ -146,21 +146,6 @@ def on_key_down(key):
         audio_manager.play_music('bg_music_missions', 0.1)
         return
 
-def set_difficulty(game: Game, interval, speed_increase_factor):
-     if game.round_score % interval == 0:
-            game.game_speed += speed_increase_factor
-
-def record_score():
-    global score_counter
-    # The higher the multiplier, the faster the score updates
-    score_counter += 1
-    base_delay = 10  
-    effective_delay = max(1, int(base_delay / game.score_multiplier)) + 3
-    
-    if score_counter >= effective_delay:
-        game.round_score += 1
-        score_counter = 0  
-
 def update():
     global score_counter 
 
@@ -179,8 +164,8 @@ def update():
         game.player.idle()
         return
     
-    set_difficulty(game, 500, 0.2)
-    record_score()
+    game.set_difficulty()
+    game.record_score()
 
     if keyboard.down and not game.player.is_jumping:
         game.player.set_is_sliding(True) 
@@ -293,7 +278,6 @@ def draw_game():
 
     if paused:
         screen.draw.text("PAUSED", center=(WIDTH // 2, HEIGHT // 2), color='yellow', fontsize=70, owidth=1, ocolor="black")
-
         
 def draw_menu():
     draw_gradient(MENU_BG_COLOUR)
