@@ -1,6 +1,7 @@
 from pygame import Rect
 from constants import WIDTH
-from sandbox import get_score_requirement, get_vault_balance_requirement
+from utils import get_score_requirement, get_vault_balance_requirement
+
 
 class Mission:
     def __init__(self, level):
@@ -31,9 +32,8 @@ class Mission:
         self.min_score = self.get_required_score()
         self.set_reward_multiplier()
         # comment this in for easy testing
-        self.vault_balance_required = 0
-        self.min_score = 12
-
+        # self.vault_balance_required = 0
+        # self.min_score = 12
 
     def check_completion(self, score, balance):
         return self.min_score <= score and self.vault_balance_required <= balance
@@ -88,8 +88,4 @@ class MissionManager:
             return True
         return False
         
-    
-# multipliers go up by 0.5 with each stage: 0.5x -> 1.0x -> 1.5
-# required balance starts at 50 and goes up exponentially
-# required score starts at 100 and goes up at a steeper rate
 

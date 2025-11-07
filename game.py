@@ -164,3 +164,4 @@ class Game:
 
     def dump_player(self):
         return self.player.__str__()
+    
