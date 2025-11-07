@@ -27,11 +27,3 @@ def get_score_requirement(level):
 
 def get_vault_balance_requirement(level):
     return growth_requirement(level, base=30, rate=1.50, log_weight=0.3)
-
-
-for i in range(1, 5):
-    print(get_score_requirement(i))
-
-
-for i in range(1, 5):
-    print(get_vault_balance_requirement(i))
