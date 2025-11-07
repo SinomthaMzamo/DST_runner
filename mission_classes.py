@@ -32,8 +32,8 @@ class Mission:
         self.min_score = self.get_required_score()
         self.set_reward_multiplier()
         # comment this in for easy testing
-        self.vault_balance_required = 0
-        self.min_score = 12
+        # self.vault_balance_required = 0
+        # self.min_score = 12
 
     def check_completion(self, score, balance):
         return self.min_score <= score and self.vault_balance_required <= balance
