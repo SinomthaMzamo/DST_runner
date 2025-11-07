@@ -304,10 +304,11 @@ def draw_menu():
     screen.draw.text("Start Game", center=start_button.center, color="black", fontsize=40)
 
     screen.draw.filled_rect(endless_button, YELLOW_ACTIVE if game.mode == 'arcade' else YELLOW_INACTIVE)
-    screen.draw.text(f"Arcade mode", center=endless_button.center, color="black", fontsize=30)
+    screen.draw.text(f"Arcade mode", center=endless_button.center, color=f"{'black' if game.mode == 'missions' else 'white'}", fontsize=30)
 
+    screen.draw.text(f"Select a game mode and press 'Start Game' to play", (50, HEIGHT - 70), color="thistle", fontsize=40)
     screen.draw.filled_rect(missions_button, YELLOW_ACTIVE if game.mode == 'missions' else YELLOW_INACTIVE)
-    screen.draw.text(f"Mission mode", center=missions_button.center, color="black", fontsize=30)
+    screen.draw.text(f"Mission mode", center=missions_button.center, color=f"{'black' if game.mode == 'arcade' else 'white'}", fontsize=30)
 
     screen.draw.filled_rect(sound_button, GRAY)
     screen.draw.text(f"Sound: {'On' if audio_manager.sound_enabled else 'Off'}", center=sound_button.center, color="black", fontsize=30)
